@@ -2,6 +2,7 @@
 import React,{useState} from "react";
 import "../assests/styles/loginmodelstyles.css"
 import dummyUsers from "../dummydata/logindummydata";
+import { Link } from "react-router-dom";
 
 const LoginModal = ({ isOpen, onClose, onLogin, users }) => {    
     const [username, setUsername] = useState("");
@@ -45,7 +46,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, users }) => {
                 <div className="extra-links">
                 <a href="#">Forgot Password?</a>
                 <span>|</span>
-                <a href="#">Create New Account</a>
+                <a href="/register">Create New Account</a>
                 </div>
                 <button className="close-button" onClick={onClose}>Close</button>
             </div>
