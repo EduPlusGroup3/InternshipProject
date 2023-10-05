@@ -26,77 +26,38 @@ const LoginModal = ({ isOpen, onClose, onLogin, users }) => {
         }
       };
 
-    // return (
-    //     <div className="modal-overlay">
-    //     <div className="modal-content">
-    //     <h2>Login</h2>
-    //     <form onSubmit={handleLogin}> 
-    //         <div class="form-group">
-    //             <label>User Name</label>
-    //             <input type="text" id="username" name="username" value={username} onChange={(e)=> setUsername(e.target.value)} className="form-control" placeholder="First name" />
-    //         </div>
-    //         <div class="form-group">
-    //             <label>Password</label>
-    //             <input type="text" id="password" name="password" value={password} onChange={(e)=> setPassword(e.target.value)} className="form-control" placeholder="Password" />
-    //         </div>  
-    //     <button type="submit" className="btn btn-primary btn-block">LOGIN</button>
-            
-    //     </form>
-    //     {error && <p className="error">{error}</p>}
-    //             <div className="extra-links">
-    //             <a href="#">Forgot Password?</a>
-    //             <span>|</span>
-    //             <a href="/register">Create New Account</a>
-    //             </div>
-    //             <button className="close-button" onClick={onClose}>Close</button>
-    //         </div>
-    //         </div>
-    //     );
-    //     };
-
     return (
-      <div className="modal-overlay">
+        <div className="modal-overlay">
         <div className="modal-content">
-          <h2>Login</h2>
-          <form onSubmit={handleLogin}>
-    
-            {/* Username Field */}
+        <h2>Login</h2>
+        <form onSubmit={handleLogin}> 
             <div class="form-group">
-              <label>User Name</label>
-              <input type="text" id="username" name="username" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control" placeholder="First name" />
+                <label>User Name</label>
+                <input type="text" id="username" name="username" value={username} onChange={(e)=> setUsername(e.target.value)} className="form-control" placeholder="First name" />
             </div>
-    
-            {/* Password Field */}
             <div class="form-group">
-              <label>Password</label>
-              <input type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" placeholder="Password" />
+                <label>Password</label>
+                <input type="text" id="password" name="password" value={password} onChange={(e)=> setPassword(e.target.value)} className="form-control" placeholder="Password" />
+            </div>  
+        <button type="submit" className="btn btn-primary btn-block">LOGIN</button>
+            
+        </form>
+        {error && <p className="error">{error}</p>}
+                <div className="extra-links">
+                <a href="#">Forgot Password?</a>
+                <span>|</span>
+                <a href="/register">Create New Account</a>
+                </div>
+                <button className="close-button" onClick={onClose}>Close</button>
             </div>
+            </div>
+        );
+        };
+
     
-            {/* Image on the right side */}
-            <img src="../assests/images/HomePicture.png" alt="HomeImage" className="right-side-image" />
-    
-            {/* Login Button */}
-            <button type="submit" className="btn btn-primary btn-block">LOGIN</button>
-          </form>
-    
-          {error && <p className="error">{error}</p>}
-    
-          {/* Extra Links */}
-          <div className="extra-links">
-            <a href="#">Forgot Password?</a>
-            <span>|</span>
-            <a href="/register">Create New Account</a>
-          </div>
-    
-          {/* Close Button */}
-          <button className="close-button" onClick={onClose}>Close</button>
-        </div>
-      </div>
-    );
-};
     
   
 
-        export default LoginModal;
+export default LoginModal;
 
 
