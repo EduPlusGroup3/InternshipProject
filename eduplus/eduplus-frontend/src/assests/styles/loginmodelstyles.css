@@ -30,14 +30,14 @@ form h4,
 form p,
 form button {
   grid-column: span 2; 
-  background-color: brown;
+  background-color: rgb(170,8,42);
   color: white;
   font-weight: bold;
   height: 30px;
 }
 
 form button:hover {
-  color: yellowgreen; 
+  color: #333; 
 }
 
 .form-group {
@@ -60,11 +60,11 @@ form button:hover {
 }
 
 .close-button:hover {
-  color: yellowgreen; 
+  color: #333; 
 }
 
 .close-button{
-  background-color: brown;
+  background-color: rgb(170,8,42);
   color: white;
   font-weight: bold;
   cursor: pointer;

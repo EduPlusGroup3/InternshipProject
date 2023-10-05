@@ -52,7 +52,7 @@
 
   form-group button[type="submit"] {
     grid-column: span 2; 
-    background-color: brown;
+    background-color: rgb(170,8,42);
     color: white;
     font-weight: bold;
     height: auto;
@@ -60,7 +60,7 @@
 
   
   .form-group button[type="submit"]:hover {
-    background-color: yellowgreen;
+    background-color: #333;
   }
   
 
