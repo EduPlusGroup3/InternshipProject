@@ -76,7 +76,7 @@ const HomePage = () => {
           className={`nav-link ${activeLink === 'geniotech' ? 'active' : ''}`}
           onClick={() => handleNavLinkClick('geniotech')}
         >
-          <img src={genioLogo} alt="Genio" style={{ height: '40px', width: 'auto' }} />
+          <img src={genioLogo} alt="Genio" style={{ height: 'auto', width: 'auto' }} />
         </a>
         <a
           href="#home"
@@ -154,7 +154,7 @@ const HomePage = () => {
 
              <span>
             <nav className="footer-navigation">
-              <a href="#geniotech" className="footer-nav-link"><img src={genioLogoFooter} alt="GenioFooter" style={{ height: '40px', width: 'auto' }} /></a>
+              <a href="#geniotech" className="footer-nav-link"><img src={genioLogoFooter} alt="GenioFooter" style={{ height: 'auto', width: 'auto' }} /></a>
               <a href="#home" className="footer-nav-link">Home</a>
               <a href="#about" className="footer-nav-link">About Us</a>
             </nav>
