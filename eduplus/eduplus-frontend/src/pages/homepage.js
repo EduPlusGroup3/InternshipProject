@@ -4,6 +4,7 @@ import "../assests/styles/homepagestyles.css";
 import genioLogo from "../assests/images/genioLogo1.png";
 import sliderRobot from "../assests/images/sliderRobot.png";
 import k12 from "../assests/images/k12.jpeg";
+import genioLogoFooter from "../assests/images/genioLogoFooter.png";
 import dummyUsers from "../dummydata/logindummydata";
 
 
@@ -150,8 +151,17 @@ const HomePage = () => {
                  </div>
              </section>
 
+
+             <span>
+            <nav className="footer-navigation">
+              <a href="#geniotech" className="footer-nav-link"><img src={genioLogoFooter} alt="GenioFooter" style={{ height: '40px', width: 'auto' }} /></a>
+              <a href="#home" className="footer-nav-link">Home</a>
+              <a href="#about" className="footer-nav-link">About Us</a>
+            </nav>
+      </span>       
+
       <footer className="footer">
-             &copy; 2023 Your Company Name. All rights reserved.
+             &copy; 2023 Eduplus. All rights reserved.
       </footer>
       </main>
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} onLogin={handleLogin} users={dummyUsers}/>

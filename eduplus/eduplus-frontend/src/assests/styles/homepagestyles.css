@@ -20,8 +20,6 @@
   align-items: center;
 }
 
-
-
 .left-section{
   margin: 10px;
   font-size: small;
@@ -187,8 +185,6 @@ main {
   }
 }
 
-
-
 h2 {
   font-size: 24px;
   margin-bottom: 10px;
@@ -216,7 +212,7 @@ h2 {
 
 .k12-content-section {
   padding: 0px;
-  background-color: rgb(170,8,42);  
+  background-color: rgb(170,8,42);   
 }
 
 .k-12 h2{
@@ -234,8 +230,6 @@ h2 {
   padding-left: 50px;
   animation: slideInFromLeft 1s ease-in-out 
 }
-
-/* Add this to your existing CSS */
 
 .contact-section {
   background-color: #fff;
@@ -255,6 +249,7 @@ h2 {
 .contact-section p {
   font-size: 18px;
   margin-bottom: 10px;
+  color: #333
 }
 
 .footer {
@@ -267,6 +262,25 @@ h2 {
     left: 0;  
   
 }
+
+.footer-navigation {
+  display: flex;
+  justify-content: center;
+  background: rgb(170,8,42);
+  padding: 50px;
+  font-weight: bold;
+}
+
+.footer-nav-link {
+  display: flex; 
+  align-items: center; 
+  color: white;
+  text-decoration: none;
+  padding: 8px 8px;
+  margin-right: 10px;
+}
+
+
 
 
 
