@@ -50,17 +50,43 @@
   }
 
 
-  form-group button[type="submit"] {
+  .form-group button[type="submit"] {
     grid-column: span 2; 
     background-color: rgb(170,8,42);
     color: white;
     font-weight: bold;
-    height: auto;
+    height: auto; 
   }
 
   
   .form-group button[type="submit"]:hover {
     background-color: #333;
+  }
+  
+  .form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .form-group select:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+
+  .form-group input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .form-group input[type="date"]:focus {
+    border-color: #007bff;
+    outline: none;
   }
   
 
