@@ -1,8 +1,9 @@
+
    
 import React,{useState} from "react";
 import "../assests/styles/loginmodelstyles.css"
 import dummyUsers from "../dummydata/logindummydata";
-import { Link } from "react-router-dom";
+
 
 const LoginModal = ({ isOpen, onClose, onLogin, users }) => {    
     const [username, setUsername] = useState("");
@@ -54,6 +55,10 @@ const LoginModal = ({ isOpen, onClose, onLogin, users }) => {
         );
         };
 
-        export default LoginModal;
+    
+    
+  
+
+export default LoginModal;
 
 
