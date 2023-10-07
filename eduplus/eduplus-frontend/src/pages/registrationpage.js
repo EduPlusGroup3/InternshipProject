@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assests/styles/registrationpagestyles.css"
 import {database} from '../firebase'
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const RegistrationPage = () => {
   const [error, setError] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
 
-  const handleRegistration = (e) => {
+  const handleRegistration = async (e) => {
     e.preventDefault();
 
     if (
@@ -40,6 +40,8 @@ const RegistrationPage = () => {
       setError("Passwords do not match");
     } else if (!isAgeValid(dob)) {
       setError("You must be at least 6 years old to register.");
+    } else if (await isEmailAlreadyRegistered(email)) {
+      setError("Email address is already registered.");
     } else {
       //setIsRegistered(true);
       registerUser();  // Register the user in Firestore
@@ -58,6 +60,13 @@ const RegistrationPage = () => {
 
     return age >= 6;
   };
+
+  const isEmailAlreadyRegistered = async (emailToCheck) => {
+    const userRef = collection(database, "users");
+    const q = query(userRef, where("email", "==", emailToCheck));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.size > 0;
+  };
   
   const registerUser = async () => {
     try {
@@ -71,6 +80,7 @@ const RegistrationPage = () => {
         country,
         region,
         gender,
+        password
       };
       const docRef = await addDoc(userRef, newUser);
 
