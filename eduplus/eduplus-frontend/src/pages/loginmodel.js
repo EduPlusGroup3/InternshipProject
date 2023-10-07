@@ -12,7 +12,8 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+//ritik
+//
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;

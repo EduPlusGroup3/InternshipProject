@@ -5,7 +5,8 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 import { database, auth } from "../firebase";
 import { query, where, getDocs } from "firebase/firestore";
-
+//below
+//
 const RegistrationPage = () => {
   const navigate = useNavigate();
   const [firstname, setFirstname] = useState("");
