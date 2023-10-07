@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assests/styles/registrationpagestyles.css"
+import {database} from '../firebase'
+import { collection, addDoc } from "firebase/firestore";
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
@@ -37,7 +39,32 @@ const RegistrationPage = () => {
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
     } else {
-      setIsRegistered(true);
+      //setIsRegistered(true);
+      registerUser();  // Register the user in Firestore
+    }
+  };
+
+  const registerUser = async () => {
+    try {
+      const userRef = collection(database, "users");
+      const newUser = {
+        firstname,
+        lastname,
+        email,
+        dob,
+        grade,
+        country,
+        region,
+        gender,
+      };
+      const docRef = await addDoc(userRef, newUser);
+
+      if (docRef.id) {
+        setIsRegistered(true);
+      }
+    } catch (error) {
+      console.error("Error registering user:", error);
+      setError("Registration failed. Please try again later.");
     }
   };
 
