@@ -281,6 +281,39 @@ h2 {
   margin-right: 10px;
 }
 
+/* Responsive styles */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px;
+  }
+
+  .button-container {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .login-button,
+  .employee-login-button {
+    margin: 10px 0;
+  }
+
+  .navigation {
+    padding: 20px;
+  }
+
+  .nav-link {
+    margin-right: 0;
+  }
+
+  .about-section::after {
+    left: 75%;
+  }
+
+  .k12-text {
+    padding-left: 20px;
+  }
+}
+
 
 
 

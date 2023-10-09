@@ -1,6 +1,7 @@
 
 import React,{useState, useEffect} from "react";
 import LoginModal from "./loginmodel";
+import ForgotPasswordModal  from "./forgotpassword";
 import "../assests/styles/homepagestyles.css";
 import genioLogo from "../assests/images/genioLogo1.png";
 import sliderRobot from "../assests/images/sliderRobot.png";
@@ -11,7 +12,8 @@ import dummyUsers from "../dummydata/logindummydata";
 
 const HomePage = () => {  
     
-        const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+        const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);  
+        const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);      
         const [isLoggedIn, setIsLoggedIn] = useState(false);
         const [username, setUsername] = useState("");
         const [currentUser, setCurrentUser] = useState(null);     
@@ -27,6 +29,15 @@ const HomePage = () => {
       
         const closeLoginModal = () => {
           setIsLoginModalOpen(false);
+        };
+
+        const openForgotModal = () => {
+          closeLoginModal(); 
+          setIsForgotModalOpen(true);
+        };
+      
+        const closeForgotModal = () => {
+          setIsForgotModalOpen(false);
         };
 
         const handleLogin = (user) => {
@@ -66,8 +77,8 @@ const HomePage = () => {
               Login
             </button>
           )}
-          <span className="pipe">|</span>
-          <button className="employee-login-button">Employee Login</button>
+          {/* <span className="pipe">|</span>
+          <button className="employee-login-button">Employee Login</button> */}
         </div>
       </header>
       <span>
@@ -165,8 +176,10 @@ const HomePage = () => {
              &copy; 2023 Eduplus. All rights reserved.
       </footer>
       </main>
-      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} onLogin={handleLogin} users={dummyUsers}/>
-      </div>
+      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} onLogin={handleLogin} openForgotModal={openForgotModal}/>
+      <ForgotPasswordModal isOpen={isForgotModalOpen} onClose={closeForgotModal} />
+    </div>
+     
 
 );
 };
