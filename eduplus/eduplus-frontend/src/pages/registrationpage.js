@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assests/styles/registrationpagestyles.css"
+import {database} from '../firebase'
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
@@ -18,7 +20,7 @@ const RegistrationPage = () => {
   const [error, setError] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
 
-  const handleRegistration = (e) => {
+  const handleRegistration = async (e) => {
     e.preventDefault();
 
     if (
@@ -36,8 +38,58 @@ const RegistrationPage = () => {
       setError("All fields are required");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
+    } else if (!isAgeValid(dob)) {
+      setError("You must be at least 6 years old to register.");
+    } else if (await isEmailAlreadyRegistered(email)) {
+      setError("Email address is already registered.");
     } else {
-      setIsRegistered(true);
+      //setIsRegistered(true);
+      registerUser();  // Register the user in Firestore
+    }
+  };
+
+  const isAgeValid = (dateOfBirth) => {
+    const currentDate = new Date();
+    const birthDate = new Date(dateOfBirth);
+    const age = currentDate.getFullYear() - birthDate.getFullYear();
+    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
+      return age - 1 >= 6;
+    }
+
+    return age >= 6;
+  };
+
+  const isEmailAlreadyRegistered = async (emailToCheck) => {
+    const userRef = collection(database, "users");
+    const q = query(userRef, where("email", "==", emailToCheck));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.size > 0;
+  };
+  
+  const registerUser = async () => {
+    try {
+      const userRef = collection(database, "users");
+      const newUser = {
+        firstname,
+        lastname,
+        email,
+        dob,
+        grade,
+        country,
+        region,
+        gender,
+        password
+      };
+      const docRef = await addDoc(userRef, newUser);
+
+      if (docRef.id) {
+        setIsRegistered(true);
+      }
+    } catch (error) {
+      console.error("Error registering user:", error);
+      setError("Registration failed. Please try again later.");
     }
   };
 
