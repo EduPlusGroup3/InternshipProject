@@ -1,14 +1,14 @@
-
 import React,{useState, useEffect} from "react";
 import LoginModal from "./loginmodel";
 import ForgotPasswordModal  from "./forgotpassword";
-import "../assests/styles/homepagestyles.css";
+import "../assests/styles/aboutusstyles.css";
 import genioLogo from "../assests/images/genioLogo1.png";
-import sliderRobot from "../assests/images/sliderRobot.png";
-import k12 from "../assests/images/k12.jpeg";
+import finalhome from "../assests/images/finalhome.png";
 import genioLogoFooter from "../assests/images/genioLogoFooter.png";
+import bgtechnoKids from "../assests/images/backgroundtechnokids.jpg";
 
-const HomePage = () => {  
+
+const AboutUSPage = () => {  
     
         const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);  
         const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);      
@@ -96,7 +96,7 @@ const HomePage = () => {
           Home
         </a>
         <a
-          href="/aboutus"
+          href="#about"
           className={`nav-link ${activeLink === 'about' ? 'active' : ''}`}
           onClick={() => handleNavLinkClick('about')}
         >
@@ -105,44 +105,42 @@ const HomePage = () => {
         </nav>
       </span>
 
-      <main>
-        <section className="content-section">
-          <div className="content">
-            <div className="text">              
-              <p>INTRODUCE YOUR KID </p>
-              <p>TO THE FUTURE</p>
-              <p>GENIO-TECH</p>
-            </div>
-            <div className="image-container">
-              <img src={sliderRobot} alt="Description" className="image" />
-            </div>
-          </div>
-        </section>   
+      <main>        
 
         <section className="about-section">
-          <h2>About Us</h2>
+          <h2>About Genio Tech</h2>
           <div className="text-container">
              <p>Genio-Tech is an organization founded in 2014 by Eng Ahmed Samir to spread Robotics, Computer Science, and STEM Education in Egypt,<br></br>
              over the last couple of years it became one of the leading STEM education academies in Alexandria and Egypt.</p>
-             <p>Genio-Tech advocates change in our young generation's brains. Therefore, our courses vary from simple physics to advanced rocket sciences,<br></br>
-             done with a twist of fun and interaction to encourage their curiosity and fuel their desire to learn.</p>
+             <p>Technology affects ebery field of or life, its not just about computers, smart phones or Tablets anymore, It's about <br></br>
+             health care, medicine energy , space research , entertainment , transportation , and even far things like contact lenses you put in your eyes and have camera in them.
+             </p>
+
+              <img src={finalhome} alt="Description" />
+
+              <p>Genio-Tech advocates change in our young generation's brains. Therefore, our courses vary from simple physics to advanced
+                rocket sciences,<br></br> done with a twist of fun and interactionto encourage their curiosity and fuel their desire to learn.
+              </p>
+              <p>
+                Science, Technology and Engineering and Math is a way to develop our kid's brain to teach them in different ways of thinking 
+                which will make them<br></br> unique, starting from communication skills, core values , self-confidence, analytical, logical thinking and problem solving
+                which will make them see<br></br> everyday problems from different prospective to deal with them easily.
+              </p>
+            </div>
+           
+            <h2>About the Founder</h2>
+            <div className="text-container">
+            <p>Eng/Ahmed Samir is the founder of Genio-Tech. With more than ten years of experience in stem education and Engineering
+              an entrepreneur who always believed<br></br> in the power of youth and their capabilities of changing the world.
+            </p>
          </div>
         </section>
 
-        <section className="k12-content-section ">
-          <div className="content">
-              <div className="k12-text">              
-                <h1>K - 12</h1>
-                <p>Child's experience highly influence brain development in early childhood stages.</p>
-                <p>We believe kids can learn anything from simple physics to advanced <br></br>rocket science but the way to do 
-                  that has to be a fun interactive way to<br></br> encourage their curiosity and fuel their desire to learn.
-                </p>
-              </div>
-              <div className="image-container">
-                <img src={k12} alt="k12" className="image" />
-              </div>
-            </div>
-        </section>
+        <section className="k12-content-section ">       
+             
+         <img src={bgtechnoKids} alt="k12" className="image" />
+              
+        </section>      
 
 
         <section className="contact-section">
@@ -159,7 +157,7 @@ const HomePage = () => {
                  <h3>Phone</h3>
                  <p>(+2) 0120459771</p>
                  </div>
-             </section>
+             </section> 
 
 
              <span>
@@ -182,4 +180,4 @@ const HomePage = () => {
 );
 };
 
-export default HomePage;
+export default AboutUSPage;

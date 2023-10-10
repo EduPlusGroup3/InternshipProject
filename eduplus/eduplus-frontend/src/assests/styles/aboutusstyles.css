@@ -9,9 +9,9 @@
 
 /* Header styles */
 .header {
-  background-color : rgb(40, 61,90);
+  background-color: rgb(40, 61, 90);
   color: white;
-  padding: 10px 0;
+  padding: 10px 20px; /* Increased padding for responsiveness */
   width: 100%;
   position: fixed;
   top: 0;
@@ -30,6 +30,7 @@
 .button-container {
   display: flex;
   align-items: center;
+  margin-right: 20px;
 }
 
 .login-button,
@@ -121,7 +122,7 @@ main {
 }
 
 .content-section {
-  padding: 50px;
+  padding: 20px;
   background-color: rgb(170,8,42);
   
 }
@@ -134,7 +135,7 @@ main {
 
 .text {
   flex: 1;
-  font-size: 60px;
+  font-size: 2em;
   color: white;
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -147,29 +148,11 @@ main {
   text-align: left; 
 }
 
-.image-container {
-  flex: 1;
-  text-align: center;
-  overflow: hidden;
-  width: auto;
-  height: auto;
-}
-
-.image {
-  max-width: 100%;
-  height: auto;
-  transition: transform 0.3s ease-in-out;
-  margin-right: 30px;
-  animation: slideInFromBottom 1s ease-in-out; 
-}
-
-.about-section {
-  background-color: #f5f5f5;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+.about-section {  
+  background-color: white;
+  padding: 20px;  
   margin: 0;
-  position: relative; 
+  overflow: hidden;
 
   &::after {
     content: '';
@@ -187,22 +170,27 @@ main {
 }
 
 h2 {
-  font-size: 24px;
+  font-size: 2em;
   margin-bottom: 10px;
   color: rgb(170,8,42);
+  text-align: left;
+  margin-left: 50px;
 }
 
 .text-container {
   width: 100%;
   height: auto;
   white-space: nowrap;
-  font-size: 18px;
-  line-height: 1.2;
+  font-size: 1.2em;
+  line-height: 1.5;
   position: relative;
   z-index: 4;
+  margin-left: 50px;
+  
 }
 
 .text-container p {
+  text-align: left;
   width: 100%;
   overflow: hidden;
   white-space: nowrap;
@@ -212,24 +200,16 @@ h2 {
 }
 
 .k12-content-section {
-  padding: 0px;
-  background-color: rgb(170,8,42);   
+  padding: 0;
+  background-color: rgb(170, 8, 42);
+  width: 100%;
+  overflow: hidden; /* Add this to hide the overflow */
 }
 
-.k-12 h2{
-  color: white;
-  text-align: left;
-  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif 
-}
-
-.k12-text{ flex: 1;
-  font-size: large;
-  color: white;  
-  margin-left: 30px;
-  text-align: left;
-  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ;
-  padding-left: 50px;
-  animation: slideInFromLeft 1s ease-in-out 
+.image {
+  width: 100%; 
+  height: auto; 
+  display: block; 
 }
 
 .contact-section {
@@ -243,19 +223,20 @@ h2 {
 }
 
 .contact-section h2 {
-  font-size: 24px;
-  margin-bottom: 20px; 
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .contact-section h3 {
-  font-size: 20px;
+  font-size: 1.2em;
   margin-bottom: 20px;
   text-align: center;
   color: rgb(170,8,42);
 }
 
 .contact-section p {
-  font-size: 18px;
+  font-size: 1em;
   margin-bottom: 10px;
   color: #333;
   text-align: center;
