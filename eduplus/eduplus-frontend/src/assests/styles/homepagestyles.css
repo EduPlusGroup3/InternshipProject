@@ -1,4 +1,5 @@
 
+
 /* src/components/HomePage.css or a separate CSS file */
 /* Global styles */
 .home-page {
@@ -134,7 +135,6 @@ main {
 
 .text {
   flex: 1;
-  font-size: 60px;
   color: white;
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -145,22 +145,26 @@ main {
 .text p {
   line-height: 0.1;
   text-align: left; 
+  font-size: xxx-large;
 }
 
 .image-container {
   flex: 1;
-  text-align: center;
+  text-align: right;
   overflow: hidden;
   width: auto;
   height: auto;
+  align-items: end;
 }
 
 .image {
   max-width: 100%;
   height: auto;
   transition: transform 0.3s ease-in-out;
-  margin-right: 30px;
+  margin-right: 130px;
+  margin-left: 50px;
   animation: slideInFromBottom 1s ease-in-out; 
+  
 }
 
 .about-section {

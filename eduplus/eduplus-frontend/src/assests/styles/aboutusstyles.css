@@ -1,6 +1,4 @@
 
-/* src/components/HomePage.css or a separate CSS file */
-/* Global styles */
 .home-page {
   text-align: center;
   padding-top: 30px;
@@ -199,9 +197,9 @@ h2 {
   font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif  
 }
 
-.k12-content-section {
+.bg_technokids-section {
   padding: 0;
-  background-color: rgb(170, 8, 42);
+  margin:0;  
   width: 100%;
   overflow: hidden; /* Add this to hide the overflow */
 }

@@ -1,3 +1,4 @@
+
 import React,{useState, useEffect} from "react";
 import LoginModal from "./loginmodel";
 import ForgotPasswordModal  from "./forgotpassword";
@@ -136,9 +137,9 @@ const AboutUSPage = () => {
          </div>
         </section>
 
-        <section className="k12-content-section ">       
+        <section className="bg_technokids-section ">       
              
-         <img src={bgtechnoKids} alt="k12" className="image" />
+         <img src={bgtechnoKids} alt="technoKids" className="image" />
               
         </section>      
 

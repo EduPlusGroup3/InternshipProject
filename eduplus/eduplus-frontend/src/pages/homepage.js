@@ -2,6 +2,7 @@
 import React,{useState, useEffect} from "react";
 import LoginModal from "./loginmodel";
 import ForgotPasswordModal  from "./forgotpassword";
+import UserHomePage from "./userhomepage";
 import "../assests/styles/homepagestyles.css";
 import genioLogo from "../assests/images/genioLogo1.png";
 import sliderRobot from "../assests/images/sliderRobot.png";
@@ -89,7 +90,7 @@ const HomePage = () => {
           <img src={genioLogo} alt="Genio" style={{ height: 'auto', width: 'auto' }} />
         </a>
         <a
-          href="/home"
+          href="/userhp"
           className={`nav-link ${activeLink === 'home' ? 'active' : ''}`}
           onClick={() => handleNavLinkClick('home')}
         >
@@ -165,7 +166,7 @@ const HomePage = () => {
              <span>
             <nav className="footer-navigation">
               <a href="/home" className="footer-nav-link"><img src={genioLogoFooter} alt="GenioFooter" style={{ height: 'auto', width: 'auto' }} /></a>
-              <a href="/home" className="footer-nav-link">Home</a>
+              <a href="/userhp" className="footer-nav-link">Home</a>
               <a href="/aboutus" className="footer-nav-link">About Us</a>
             </nav>
       </span>       
