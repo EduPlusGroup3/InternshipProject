@@ -1,11 +1,11 @@
-.home-page {
+.user-home-page {
   text-align: center;
   padding-top: 30px;
   padding-bottom: 20px;
 }
 
 /* Header styles */
-.header {
+.userheader {
   background-color : rgb(40, 61,90);
   color: white;
   padding: 10px 0;
@@ -53,7 +53,7 @@
   font-size: 20px;
   margin-right: 10px;
 }
-.navigation {
+.userhpnavigation {
   display: flex;
   justify-content: center;
   background: #fff;
@@ -61,7 +61,7 @@
   font-weight: bold;
 }
 
-.nav-link {
+.hpnav-link {
   display: flex; 
   align-items: center; 
   color: #333;
@@ -70,20 +70,20 @@
   margin-right: 10px;
 }
 
-.nav-link:hover {
+.hpnav-link:hover {
   background: transparent;
   color: rgb(170,8,42);
 }
 
 
-.nav-link.active {
+.hpnav-link.active {
   color:rgb(170,8,42); 
   background-color:transparent; 
   border-radius: 4px;
   
 }
 
-.main {  
+.userhpmain {  
   background-color: white;
 }
 
@@ -165,6 +165,7 @@
 }
 
 /* Responsive styles */
+
 @media (max-width: 768px) {
   .header {
     padding: 10px;
@@ -188,13 +189,6 @@
     margin-right: 0;
   }
 
-  .about-section::after {
-    left: 75%;
-  }
-
-  .k12-text {
-    padding-left: 20px;
-  }
 }
 
 

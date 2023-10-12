@@ -139,7 +139,7 @@ const AboutUSPage = () => {
 
         <section className="bg_technokids-section ">       
              
-         <img src={bgtechnoKids} alt="technoKids" className="image" />
+         <img src={bgtechnoKids} alt="technoKids" className="k12image" />
               
         </section>      
 

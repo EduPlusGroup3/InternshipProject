@@ -112,8 +112,8 @@ const UserHomePage = () => {
   ];
 
   return (
-    <div className="home-page">
-      <header className="header">
+    <div className="user-home-page">
+      <header className="userheader">
         <div className="left-section">
           <span role="img" aria-label="telephone">
             📞
@@ -136,24 +136,24 @@ const UserHomePage = () => {
         </div>
       </header>
       <span>
-        <nav className="navigation">
+        <nav className="userhpnavigation">
           <a
             href="/home"
-            className={`nav-link ${activeLink === "geniotech" ? "active" : ""}`}
+            className={`hpnav-link ${activeLink === "geniotech" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("geniotech")}
           >
             <img src={genioLogo} alt="Genio" style={{ height: "auto", width: "auto" }} />
           </a>
           <a
             href="/home"
-            className={`nav-link ${activeLink === "home" ? "active" : ""}`}
+            className={`hpnav-link ${activeLink === "home" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("home")}
           >
             Home
           </a>
           <a
             href="/aboutus"
-            className={`nav-link ${activeLink === "about" ? "active" : ""}`}
+            className={`hpnav-link ${activeLink === "about" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("about")}
           >
             About Us
@@ -161,7 +161,7 @@ const UserHomePage = () => {
         </nav>
       </span>
 
-      <main className="main">
+      <main className="userhpmain">
         <section className="menu-section">
           <VerticalMenu
             items={menuItems}
