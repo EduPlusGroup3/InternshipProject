@@ -76,7 +76,7 @@ const RegistrationPage = () => {
         firstname,       
         email,
         country,
-        region,
+        // region,
         gender,
         password
       };
@@ -97,7 +97,7 @@ const RegistrationPage = () => {
         <div className="registration-success">
           <h2>Registration Successful!</h2>
           <p>
-            Your registration is complete. You can now proceed to the Home page.
+            Your registration is complete.Your emailId will ne your username. You can now proceed to the Home page.
           </p>
           <button onClick={() => navigate("/home")}>Proceed to Home</button>
         </div>
@@ -106,7 +106,7 @@ const RegistrationPage = () => {
           <h2>Registration</h2>
           <form onSubmit={handleRegistration}>
             <div className="form-group">
-              <label htmlFor="firstname">First Name</label>
+              <label htmlFor="firstname">First Name<span className="asteriskColor">*</span></label>
               <input
                 type="text"
                 id="firstname"
@@ -128,7 +128,7 @@ const RegistrationPage = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">Password<span className="asteriskColor">*</span></label>
               <input
                 type="password"
                 id="password"
@@ -139,7 +139,7 @@ const RegistrationPage = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
+              <label htmlFor="confirmPassword">Confirm Password<span className="asteriskColor">*</span></label>
               <input
                 type="password"
                 id="confirmPassword"
@@ -150,7 +150,7 @@ const RegistrationPage = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">Email<span className="asteriskColor">*</span></label>
               <input
                 type="email"
                 id="email"
@@ -161,21 +161,21 @@ const RegistrationPage = () => {
               />
             </div>            
             <div className="form-group">
-              <label htmlFor="country">Country</label>
+              <label htmlFor="country">Country<span className="asteriskColor">*</span></label>
               <select
-          id="country"
-          name="country"
-          placeholder="Country"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-        >
-          <option value="">Select Country</option>
-          {countriesList.map((countryOption) => (
-            <option key={countryOption} value={countryOption}>
-              {countryOption}
-            </option>
-          ))}
-        </select>
+                id="country"
+                name="country"
+                placeholder="Country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              >
+              <option value="">Select Country</option>
+              {countriesList.map((countryOption) => (
+                <option key={countryOption} value={countryOption}>
+                  {countryOption}
+                </option>
+              ))}
+            </select>
             </div>
             <div className="form-group">
               <label htmlFor="region">Region</label>
@@ -189,7 +189,7 @@ const RegistrationPage = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="gender">Gender</label>
+              <label htmlFor="gender">Gender<span className="asteriskColor">*</span></label>
               <select
                 id="gender"
                 name="gender"
