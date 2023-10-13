@@ -3,24 +3,27 @@ import React,{useState, useEffect} from "react";
 import LoginModal from "./loginmodel";
 import ForgotPasswordModal  from "./forgotpassword";
 import "../assests/styles/aboutusstyles.css";
+import { useNavigate } from "react-router-dom";
 import genioLogo from "../assests/images/genioLogo1.png";
 import finalhome from "../assests/images/finalhome.png";
 import genioLogoFooter from "../assests/images/genioLogoFooter.png";
 import bgtechnoKids from "../assests/images/backgroundtechnokids.jpg";
+import { useAuth } from "../pages/authcontext";
 
 
 const AboutUSPage = () => {  
-    
+        const navigate = useNavigate();
+        const { isLoggedIn, username, login, logout, currentUser } = useAuth();
         const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);  
-        const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);      
-        const [isLoggedIn, setIsLoggedIn] = useState(false);
-        const [username, setUsername] = useState("");
-        const [currentUser, setCurrentUser] = useState(null);     
+        const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
         const [activeLink, setActiveLink] = useState('home');
 
         useEffect(() => {
+          console.log("isLoggedIn:", isLoggedIn);
+        console.log("username:", username);
+        console.log("currentUser:", currentUser);
           setActiveLink('home');
-        }, []);
+        }, [isLoggedIn, username, currentUser]);
       
         const openLoginModal = () => {
           setIsLoginModalOpen(true);
@@ -37,29 +40,18 @@ const AboutUSPage = () => {
       
         const closeForgotModal = () => {
           setIsForgotModalOpen(false);
-        };
-
-        const handleLogin = (user) => {
-            setIsLoggedIn(true);
-            setUsername(user.username);
-            setCurrentUser(user);
-            closeLoginModal();
-          };
-        
-          const handleLogout = () => {
-            setIsLoggedIn(false);
-            setUsername("");
-            setCurrentUser(null);
-          };
+        };      
 
           const handleNavLinkClick = (link) => {
             setActiveLink(link);
           };
 
+          const isParent = currentUser && currentUser.role === 'parent';
+
 
   return (
     <div className="home-page">
-      <header className="header">     
+       <header className="header">     
       <div className="left-section">          
             <span role="img" aria-label="telephone">📞</span> TEL:(+2)03 5832593         
         </div>
@@ -67,7 +59,7 @@ const AboutUSPage = () => {
         {isLoggedIn ? (
             <>
               <span className="login-button">{username}</span>
-              <button className="login-button" onClick={handleLogout}>
+              <button className="login-button" onClick={logout}>
                 Logout
               </button>
             </>
@@ -76,8 +68,10 @@ const AboutUSPage = () => {
               Login
             </button>
           )}
-          {/* <span className="pipe">|</span>
-          <button className="employee-login-button">Employee Login</button> */}
+          {isParent && ( <span className="pipe">|</span>)}
+          {isParent && (
+                        <button className="employee-login-button" onClick={() => navigate("/childregister")}>Child Registration</button>
+                    )}
         </div>
       </header>
       <span>
@@ -173,7 +167,7 @@ const AboutUSPage = () => {
              &copy; 2023 Eduplus. All rights reserved.
       </footer>
       </main>
-      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} onLogin={handleLogin} openForgotModal={openForgotModal}/>
+      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} onLogin={login} openForgotModal={openForgotModal}/>
       <ForgotPasswordModal isOpen={isForgotModalOpen} onClose={closeForgotModal} />
     </div>
      
