@@ -1,46 +1,55 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assests/styles/registrationpagestyles.css"
 import countriesList from '../dummydata/countries';
 import {database} from '../firebase'
+import { useAuth } from "../pages/authcontext";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 
-const RegistrationPage = () => {
+const ChildRegistrationPage = () => {
   const navigate = useNavigate();
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [email, setEmail] = useState("");  
+  const [email, setEmail] = useState("");
+  const [dob, setDOB] = useState("");
+  const [grade, setGrade] = useState("");
   const [country, setCountry] = useState("");
+  const [countries, setCountries] = useState([]);
   const [region, setRegion] = useState("");
   const [gender, setGender] = useState("");
   const [error, setError] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
-  const [countries, setCountries] = useState([]);
+  const { username: loggedInUserEmail } = useAuth();
 
   useEffect(() => {
     // Use the countriesList from the imported file
     setCountries(countriesList);
   }, []);
 
+
   const handleRegistration = async (e) => {
     e.preventDefault();
 
     if (
       !firstname ||
-      !lastname ||
+      // !lastname ||
       !password ||
       !confirmPassword ||
-      !email ||      
+      // !email ||
+      !dob ||
+      !grade ||
       !country ||
-      !region ||
+      // !region ||
       !gender
     ) {
-      setError("All fields are required");
+      setError("Kinldy fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
-      setError("Passwords do not match");    
+      setError("Passwords do not match");
+    } else if (!isAgeValid(dob)) {
+      setError("You must be at least 6 years old to register.");
     } else if (await isEmailAlreadyRegistered(email)) {
       setError("Email address is already registered.");
     } else {
@@ -73,10 +82,13 @@ const RegistrationPage = () => {
     try {
       const userRef = collection(database, "users");
       const newUser = {
-        firstname,       
+        firstname,
+        // lastname,
         email,
+        dob,
+        grade,
         country,
-        region,
+        // region,
         gender,
         password
       };
@@ -97,13 +109,13 @@ const RegistrationPage = () => {
         <div className="registration-success">
           <h2>Registration Successful!</h2>
           <p>
-            Your registration is complete.Your emailId will ne your username. You can now proceed to the Home page.
+            Your registration is complete. Your First Name will be your UserName. You can now proceed to the Home page.
           </p>
           <button onClick={() => navigate("/home")}>Proceed to Home</button>
         </div>
       ) : (
         <div className="registraton-content">
-          <h2>Registration</h2>
+          <h2>Child Registration</h2>
           <form onSubmit={handleRegistration}>
             <div className="form-group">
               <label htmlFor="firstname">First Name<span className="asteriskColor">*</span></label>
@@ -156,10 +168,31 @@ const RegistrationPage = () => {
                 id="email"
                 name="email"
                 placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={loggedInUserEmail}
+                readOnly
               />
-            </div>            
+            </div>
+            <div className="form-group">
+              <label htmlFor="dob">Date of Birth<span className="asteriskColor">*</span></label>
+              <input
+                type="date"
+                id="dob"
+                name="dob"
+                value={dob}
+                onChange={(e) => setDOB(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="grade">Grade in School<span className="asteriskColor">*</span></label>
+              <input
+                type="text"
+                id="grade"
+                name="grade"
+                placeholder="Grade"
+                value={grade}
+                onChange={(e) => setGrade(e.target.value)}
+              />
+            </div>
             <div className="form-group">
               <label htmlFor="country">Country<span className="asteriskColor">*</span></label>
               <select
@@ -211,4 +244,4 @@ const RegistrationPage = () => {
   );
 };
 
-export default RegistrationPage;
+export default ChildRegistrationPage;

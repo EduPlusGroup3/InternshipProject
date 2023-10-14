@@ -1,0 +1,237 @@
+.user-home-page {
+    text-align: center;
+    padding-top: 30px;
+    padding-bottom: 20px;   
+  }
+  
+  /* Header styles */
+  .userheader {
+    background-color: rgb(40, 61, 90);
+    color: white;
+    padding: 10px 0;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .left-section {
+    margin: 10px;
+    font-size: small;
+    font-weight: bold;
+  }
+  
+  .button-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .login-button,
+  .employee-login-button {
+    background-color: transparent;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: small;
+    text-align: right;
+    margin-right: 20px;
+    font-weight: bold;
+  }
+  
+  .login-button:hover,
+  .employee-login-button:hover {
+    background-color: transparent;
+    text-decoration: none;
+  }
+  
+  .pipe {
+    color: white;
+    font-size: 20px;
+    margin-right: 10px;
+  }
+  
+  .userhpnavigation {
+    display: flex;
+    justify-content: center;
+    background: white;
+    padding: 50px;
+    font-weight: bold;
+  }
+  
+  .hpnav-link {
+    display: flex;
+    align-items: center;
+    color: #333;
+    text-decoration: none;
+    padding: 8px 8px;
+    margin-right: 10px;
+  }
+  
+  .hpnav-link:hover {
+    background: transparent;
+    color: rgb(170, 8, 42);
+  }
+  
+  .hpnav-link.active {
+    color: rgb(170, 8, 42);
+    background-color: transparent;
+    border-radius: 4px;
+  }
+  
+  .userhpmain {  
+    background-color: white;
+    flex: 1;
+  }
+  
+  .menu-section {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-evenly;
+    padding: 20px;
+    background-color: rgb(251,247,245);
+    
+  }
+  
+  .vertical-menu {
+    flex: 1;
+    max-width: 20%;
+    order: 0;
+    margin-right: 20px;   
+  }
+  
+  .vertical-menu ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .vertical-menu li {
+    margin-bottom: 10px;
+  }
+  
+  .vertical-menu a {
+    text-decoration: none;
+    color: rgb(170, 8, 42);
+    font-weight: bold;
+    font-size: 18px;
+    display: block;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid rgb(170, 8, 42);
+    border-radius: 5px;
+    
+  }
+  
+  .vertical-menu a:hover {
+    background-color: rgb(170, 8, 42);
+    color: #fff;
+  }
+  
+  .user-profile {    
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: rgb(170, 8, 42);
+    width: 90%;
+    max-width: 800px;
+    background-color: white;   
+  }
+  
+  
+  .user-profile h2 {
+    margin-bottom: 20px;
+    color: rgb(170, 8, 42);
+    text-align: center;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+    color: rgb(170, 8, 42);
+    text-align: left;
+  }
+  
+  input,
+  select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid rgb(170, 8, 42);
+    border-radius: 5px;
+    background-color: white;
+    color: rgb(170, 8, 42);
+  }
+  
+  input[readonly],
+  select[readonly] {
+    background-color: #f7f7f7; /* Lighter white */
+    cursor: not-allowed;
+  }
+  
+  input:focus,
+  select:focus {
+    outline: none;
+    border-color: rgb(170, 8, 42);
+    box-shadow: 0 0 5px rgba(170, 8, 42, 0.5);
+  }
+  
+  /* ... (remaining styles) */
+  
+  
+  .footer {
+    background-color: rgb(40, 61, 90);
+    color: gray;
+    padding: 10px 0;
+    width: 100%;
+    position: static;
+    bottom: 0;
+    left: 0;
+  }
+  
+  .footer-navigation {
+    display: flex;
+    justify-content: center;
+    background: rgb(170, 8, 42);
+    padding: 50px;
+    font-weight: bold;
+  }
+  
+  .footer-nav-link {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    padding: 8px 8px;
+    margin-right: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .header {
+      padding: 10px;
+    }
+  
+    .button-container {
+      flex-direction: column;
+      align-items: flex-end;
+    }
+  
+    .login-button,
+    .employee-login-button {
+      margin: 10px 0;
+    }
+  
+    .navigation {
+      padding: 20px;
+    }
+  
+    .nav-link {
+      margin-right: 0;
+    }
+  }
+  
