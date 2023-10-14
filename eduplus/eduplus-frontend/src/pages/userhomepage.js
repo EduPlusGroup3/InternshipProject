@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
+import { useNavigate } from "react-router-dom";
 import RescheduleClasses from "./rescheduleclasses";
 import MyClasses from "./myclasses";
 import ClassesPreferred from "./classespreferred";
@@ -9,13 +10,14 @@ import "../assests/styles/userhomepagestyles.css";
 import genioLogo from "../assests/images/genioLogo1.png";
 import genioLogoFooter from "../assests/images/genioLogoFooter.png";
 import VerticalMenu from "./verticalmenu";
+import { useAuth } from "../pages/authcontext";
+
 
 const UserHomePage = () => {
+  const navigate = useNavigate();
+  const { isLoggedIn, username, login, logout, currentUser } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
-  const [currentUser, setCurrentUser] = useState(null);
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);  
   const [openModal, setOpenModal] = useState(null);
   const [activeLink, setActiveLink] = useState("home");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -46,19 +48,6 @@ const UserHomePage = () => {
 
   const closeForgotModal = () => {
     setIsForgotModalOpen(false);
-  };
-
-  const handleLogin = (user) => {
-    setIsLoggedIn(true);
-    setUsername(user.username);
-    setCurrentUser(user);
-    closeLoginModal();
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUsername("");
-    setCurrentUser(null);
   };
 
   const handleNavLinkClick = (link) => {
@@ -111,49 +100,52 @@ const UserHomePage = () => {
     { id: "myClasses", label: "My Classes" },
   ];
 
+  const isParent = currentUser && currentUser.role === 'parent';
+
   return (
-    <div className="home-page">
-      <header className="header">
-        <div className="left-section">
-          <span role="img" aria-label="telephone">
-            📞
-          </span>{" "}
-          TEL:(+2)03 5832593
-        </div>
-        <div className="button-container">
+    <div className="user-home-page">
+      <header className="header">     
+        <div className="left-section">          
+              <span role="img" aria-label="telephone">📞</span> TEL:(+2)03 5832593         
+          </div>
+          <div className="button-container">          
           {isLoggedIn ? (
-            <>
-              <span className="login-button">{username}</span>
-              <button className="login-button" onClick={handleLogout}>
-                Logout
+              <>
+                <span className="login-button">{username}</span>
+                <button className="login-button" onClick={logout}>
+                  Logout
+                </button>
+              </>
+            ) : (
+              <button className="login-button" onClick={openLoginModal}>
+                Login
               </button>
-            </>
-          ) : (
-            <button className="login-button" onClick={openLoginModal}>
-              Login
-            </button>
-          )}
-        </div>
-      </header>
+            )}
+            {isParent && ( <span className="pipe">|</span>)}
+            {isParent && (
+                          <button className="employee-login-button" onClick={() => navigate("/childregister")}>Child Registration</button>
+                      )}
+          </div>
+        </header>
       <span>
-        <nav className="navigation">
+        <nav className="userhpnavigation">
           <a
             href="/home"
-            className={`nav-link ${activeLink === "geniotech" ? "active" : ""}`}
+            className={`hpnav-link ${activeLink === "geniotech" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("geniotech")}
           >
             <img src={genioLogo} alt="Genio" style={{ height: "auto", width: "auto" }} />
           </a>
           <a
             href="/home"
-            className={`nav-link ${activeLink === "home" ? "active" : ""}`}
+            className={`hpnav-link ${activeLink === "home" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("home")}
           >
             Home
           </a>
           <a
             href="/aboutus"
-            className={`nav-link ${activeLink === "about" ? "active" : ""}`}
+            className={`hpnav-link ${activeLink === "about" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("about")}
           >
             About Us
@@ -161,7 +153,7 @@ const UserHomePage = () => {
         </nav>
       </span>
 
-      <main className="main">
+      <main className="userhpmain">
         <section className="menu-section">
           <VerticalMenu
             items={menuItems}
@@ -201,7 +193,7 @@ const UserHomePage = () => {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={closeLoginModal}
-        onLogin={handleLogin}
+        onLogin={login}
         openForgotModal={openForgotModal}
       />
       <ForgotPasswordModal isOpen={isForgotModalOpen} onClose={closeForgotModal} />
