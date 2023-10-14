@@ -211,12 +211,12 @@ const ChildRegistrationPage = () => {
             </select>
             </div>
             <div className="form-group">
-              <label htmlFor="region">Region</label>
+              <label htmlFor="region">State/Province</label>
               <input
                 type="text"
                 id="region"
                 name="region"
-                placeholder="Region"
+                placeholder="State/Province"
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
               />

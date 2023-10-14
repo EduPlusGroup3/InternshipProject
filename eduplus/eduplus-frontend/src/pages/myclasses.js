@@ -2,7 +2,7 @@
 
 import React from "react";
 
-const UserProfile = ({ onClose, username }) => {
+const MyClasses = ({ onClose, username }) => {
   return (
     <div className="user-profile">
       <div className="profile-content">
@@ -15,4 +15,4 @@ const UserProfile = ({ onClose, username }) => {
   );
 };
 
-export default UserProfile;
+export default MyClasses;
