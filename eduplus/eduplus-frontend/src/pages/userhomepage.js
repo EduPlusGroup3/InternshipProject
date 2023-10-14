@@ -3,7 +3,7 @@ import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
 import { useNavigate } from "react-router-dom";
 import RescheduleClasses from "./rescheduleclasses";
-import MyClasses from "./myclasses";
+import Enquiry from "./enquiry";
 import ClassesPreferred from "./classespreferred";
 import ForgotPasswordModal from "./forgotpassword";
 import "../assests/styles/userhomepagestyles.css";
@@ -11,7 +11,6 @@ import genioLogo from "../assests/images/genioLogo1.png";
 import genioLogoFooter from "../assests/images/genioLogoFooter.png";
 import VerticalMenu from "./verticalmenu";
 import { useAuth } from "../pages/authcontext";
-
 
 const UserHomePage = () => {
   const navigate = useNavigate();
@@ -23,13 +22,13 @@ const UserHomePage = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isClassesPreferOpen, setIsClassesPreferOpen] = useState(false);
   const [isClasRescheduleOpen, setIsClassesRescheduleOpen] = useState(false);
-  const [isMyClassesOpen, setIsMyClassesOpen] = useState(false);
+  const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
 
   useEffect(() => {
     setActiveLink("home");
     setIsProfileOpen(true);
     setIsClassesPreferOpen(false);
-    setIsMyClassesOpen(false);
+    setIsEnquiryOpen(false);
     setIsClassesRescheduleOpen(false);
   }, []);
 
@@ -54,24 +53,27 @@ const UserHomePage = () => {
     if (link === "profile") {
       setIsProfileOpen(true);
       setIsClassesPreferOpen(false);
-      setIsMyClassesOpen(false);
+      setIsEnquiryOpen(false);
       setIsClassesRescheduleOpen(false);
     } else if (link === "classesPreferred") {
       setIsClassesPreferOpen(true);
       setIsProfileOpen(false);
-      setIsMyClassesOpen(false);
+      setIsEnquiryOpen(false);
       setIsClassesRescheduleOpen(false);
     } else if (link === "rescheduleClasses") {
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
-      setIsMyClassesOpen(false);
+      setIsEnquiryOpen(false);
       setIsClassesRescheduleOpen(true);
-    } else if (link === "myClasses") {
+    } else if (link === "enquiry") {
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
-      setIsMyClassesOpen(true);
+      setIsEnquiryOpen(true);
       setIsClassesRescheduleOpen(false);
-    } else {
+    }else if(link === "contactus"){
+      setIsEnquiryOpen(true);
+    } 
+    else {
       setActiveLink(link);
       setOpenModal(link);
     }
@@ -85,8 +87,8 @@ const UserHomePage = () => {
     setIsClassesPreferOpen(false);
   };
 
-  const closeMyClassesModal = () => {
-    setIsMyClassesOpen(false);
+  const closeEnquiryModal = () => {
+    setIsEnquiryOpen(false);
   };
 
   const closeRescheduleClassesModal = () => {
@@ -97,7 +99,7 @@ const UserHomePage = () => {
     { id: "profile", label: "Profile" },
     { id: "classesPreferred", label: "Classes Preferred" },
     { id: "rescheduleClasses", label: "Reschedule Classes" },
-    { id: "myClasses", label: "My Classes" },
+    { id: "enquiry", label: "Enquiry" },
   ];
 
   const isParent = currentUser && currentUser.role === 'parent';
@@ -164,7 +166,7 @@ const UserHomePage = () => {
           {isClassesPreferOpen && (
             <ClassesPreferred onClose={closeClassesPreferModal} username={username} />
           )}
-          {isMyClassesOpen && <MyClasses onClose={closeMyClassesModal} username={username} />}
+          {isEnquiryOpen && <Enquiry onClose={closeEnquiryModal} username={username} />}
           {isClasRescheduleOpen && (
             <RescheduleClasses onClose={closeRescheduleClassesModal} username={username} />
           )}
@@ -180,7 +182,7 @@ const UserHomePage = () => {
               style={{ height: "auto", width: "auto" }}
             />
           </a>
-          <a href="/home" className="footer-nav-link">
+          <a href="/userhp" className="footer-nav-link">
             Home
           </a>
           <a href="/aboutus" className="footer-nav-link">
