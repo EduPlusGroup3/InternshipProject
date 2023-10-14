@@ -76,7 +76,7 @@ const RegistrationPage = () => {
         firstname,       
         email,
         country,
-        // region,
+        region,
         gender,
         password
       };
