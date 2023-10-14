@@ -139,7 +139,7 @@ const UserHomePage = () => {
             <img src={genioLogo} alt="Genio" style={{ height: "auto", width: "auto" }} />
           </a>
           <a
-            href="/home"
+            href="/userhp"
             className={`hpnav-link ${activeLink === "home" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("home")}
           >
