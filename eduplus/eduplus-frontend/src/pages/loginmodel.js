@@ -4,9 +4,11 @@ import "../assests/styles/loginmodelstyles.css";
 import dummyUsers from "../dummydata/logindummydata";
 import ForgotPasswordModal from "./forgotpassword";
 import close from "../assests/images/close.png";
+import { useNavigate } from "react-router-dom";
 
 
 const LoginModal = ({ isOpen, onClose, onLogin , openForgotModal }) => {
+  const navigate = useNavigate();
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -36,6 +38,7 @@ const LoginModal = ({ isOpen, onClose, onLogin , openForgotModal }) => {
       setUsername("");
       setPassword("");
       setSelectedRole("user"); // Reset the role to the default after login
+      navigate("/userhp");
     } else {
       setError("Invalid username or password");
     }
