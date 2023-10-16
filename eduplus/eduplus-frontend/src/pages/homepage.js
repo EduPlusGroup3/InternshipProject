@@ -80,7 +80,7 @@
               <img src={genioLogo} alt="Genio" style={{ height: 'auto', width: 'auto' }} />
             </a>
             <a
-              href="/userhp"
+              href="/home"
               className={`nav-link ${activeLink === 'home' ? 'active' : ''}`}
               onClick={() => handleNavLinkClick('home')}
             >
@@ -156,7 +156,7 @@
                 <span>
                 <nav className="footer-navigation">
                   <a href="/home" className="footer-nav-link"><img src={genioLogoFooter} alt="GenioFooter" style={{ height: 'auto', width: 'auto' }} /></a>
-                  <a href="/userhp" className="footer-nav-link">Home</a>
+                  <a href="/home" className="footer-nav-link">Home</a>
                   <a href="/aboutus" className="footer-nav-link">About Us</a>
                 </nav>
           </span>       

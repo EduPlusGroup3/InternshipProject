@@ -233,5 +233,42 @@
     .nav-link {
       margin-right: 0;
     }
+
+   /*for myclasses model*/
+   /* MyClasses.css */
+
+   .class-box {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .attended-box {
+    background-color: #e6f7ff; /* Light blue background color for attended classes */
+  }
+  
+  .missed-box {
+    background-color: #ffd6cc; /* Light red background color for missed classes */
+  }
+  
+  .upcoming-box {
+    background-color: #e6ffe6; /* Light green background color for upcoming classes */
+  }
+  
+  .class-box h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+  
+  .class-box ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .class-box li {
+    margin-bottom: 5px;
+  }
+
+
   }
   

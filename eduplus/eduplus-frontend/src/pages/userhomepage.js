@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
 import { useNavigate } from "react-router-dom";
-import RescheduleClasses from "./rescheduleclasses";
+import MyClasses from "./myclasses";
 import Enquiry from "./enquiry";
 import ClassesPreferred from "./classespreferred";
 import ForgotPasswordModal from "./forgotpassword";
@@ -11,6 +11,7 @@ import genioLogo from "../assests/images/genioLogo1.png";
 import genioLogoFooter from "../assests/images/genioLogoFooter.png";
 import VerticalMenu from "./verticalmenu";
 import { useAuth } from "../pages/authcontext";
+import dummyClassesData from "../dummydata/classesAttended";
 
 const UserHomePage = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const UserHomePage = () => {
   const [activeLink, setActiveLink] = useState("home");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isClassesPreferOpen, setIsClassesPreferOpen] = useState(false);
-  const [isClasRescheduleOpen, setIsClassesRescheduleOpen] = useState(false);
+  const [ismyClassesOpen, setIsMyClassesOpen] = useState(false);
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const UserHomePage = () => {
     setIsProfileOpen(true);
     setIsClassesPreferOpen(false);
     setIsEnquiryOpen(false);
-    setIsClassesRescheduleOpen(false);
+    setIsMyClassesOpen(false);
   }, []);
 
   const openLoginModal = () => {
@@ -54,24 +55,22 @@ const UserHomePage = () => {
       setIsProfileOpen(true);
       setIsClassesPreferOpen(false);
       setIsEnquiryOpen(false);
-      setIsClassesRescheduleOpen(false);
+      setIsMyClassesOpen(false);
     } else if (link === "classesPreferred") {
       setIsClassesPreferOpen(true);
       setIsProfileOpen(false);
       setIsEnquiryOpen(false);
-      setIsClassesRescheduleOpen(false);
-    } else if (link === "rescheduleClasses") {
+      setIsMyClassesOpen(false);
+    } else if (link === "myclasses") {
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
       setIsEnquiryOpen(false);
-      setIsClassesRescheduleOpen(true);
+      setIsMyClassesOpen(true);
     } else if (link === "enquiry") {
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
       setIsEnquiryOpen(true);
-      setIsClassesRescheduleOpen(false);
-    }else if(link === "contactus"){
-      setIsEnquiryOpen(true);
+      setIsMyClassesOpen(false);
     } 
     else {
       setActiveLink(link);
@@ -91,14 +90,14 @@ const UserHomePage = () => {
     setIsEnquiryOpen(false);
   };
 
-  const closeRescheduleClassesModal = () => {
-    setIsClassesRescheduleOpen(false);
+  const closeMyClassesModal = () => {
+    setIsMyClassesOpen(false);
   };
 
   const menuItems = [
     { id: "profile", label: "Profile" },
     { id: "classesPreferred", label: "Classes Preferred" },
-    { id: "rescheduleClasses", label: "Reschedule Classes" },
+    { id: "myclasses", label: "My Classes" },
     { id: "enquiry", label: "Enquiry" },
   ];
 
@@ -139,7 +138,7 @@ const UserHomePage = () => {
             <img src={genioLogo} alt="Genio" style={{ height: "auto", width: "auto" }} />
           </a>
           <a
-            href="/userhp"
+            href="/home"
             className={`hpnav-link ${activeLink === "home" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("home")}
           >
@@ -167,8 +166,9 @@ const UserHomePage = () => {
             <ClassesPreferred onClose={closeClassesPreferModal} username={username} />
           )}
           {isEnquiryOpen && <Enquiry onClose={closeEnquiryModal} username={username} />}
-          {isClasRescheduleOpen && (
-            <RescheduleClasses onClose={closeRescheduleClassesModal} username={username} />
+          {ismyClassesOpen && (
+            <MyClasses onClose={closeMyClassesModal} username={username} classesData={dummyClassesData} />
+            
           )}
         </section>
       </main>
@@ -182,7 +182,7 @@ const UserHomePage = () => {
               style={{ height: "auto", width: "auto" }}
             />
           </a>
-          <a href="/userhp" className="footer-nav-link">
+          <a href="/home" className="footer-nav-link">
             Home
           </a>
           <a href="/aboutus" className="footer-nav-link">
