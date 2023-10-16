@@ -1,11 +1,12 @@
-
+import "..//assests/styles/registrationpagestyles.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../assests/styles/registrationpagestyles.css"
-import countriesList from '../dummydata/countries';
-import {database} from '../firebase'
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
-
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, addDoc, doc, setDoc } from "firebase/firestore";
+import { database, auth } from "../firebase";
+import { query, where, getDocs } from "firebase/firestore";
+//below
+//
 const RegistrationPage = () => {
   const navigate = useNavigate();
   const [firstname, setFirstname] = useState("");
@@ -44,8 +45,7 @@ const RegistrationPage = () => {
     } else if (await isEmailAlreadyRegistered(email)) {
       setError("Email address is already registered.");
     } else {
-      //setIsRegistered(true);
-      registerUser();  // Register the user in Firestore
+      registerUser(); // Register the user in Firestore
     }
   };
 
@@ -55,7 +55,10 @@ const RegistrationPage = () => {
     const age = currentDate.getFullYear() - birthDate.getFullYear();
     const monthDiff = currentDate.getMonth() - birthDate.getMonth();
 
-    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())
+    ) {
       return age - 1 >= 6;
     }
 
@@ -68,21 +71,34 @@ const RegistrationPage = () => {
     const querySnapshot = await getDocs(q);
     return querySnapshot.size > 0;
   };
-  
+
   const registerUser = async () => {
     try {
-      const userRef = collection(database, "users");
-      const newUser = {
-        firstname,       
+      const authInstance = getAuth();
+      const { user } = await createUserWithEmailAndPassword(
+        authInstance,
         email,
-        country,
-        region,
-        gender,
         password
-      };
-      const docRef = await addDoc(userRef, newUser);
+      );
 
-      if (docRef.id) {
+      if (user) {
+        // Create a new document with the user's UID as the document ID
+        const userDocRef = doc(database, "users", user.uid);
+
+        // Set user data within that document
+        await setDoc(userDocRef, {
+          firstname,
+          lastname,
+          email,
+          dob,
+          grade,
+          country,
+          region,
+          gender,
+          password,
+          uid:user.uid
+        });
+
         setIsRegistered(true);
       }
     } catch (error) {
@@ -91,14 +107,25 @@ const RegistrationPage = () => {
     }
   };
 
+  useEffect(() => {
+    // Check if the user is already authenticated, and if so, redirect them to the home page
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigate("/home");
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [navigate]);
+
   return (
     <div className="registration-page">
       {isRegistered ? (
         <div className="registration-success">
           <h2>Registration Successful!</h2>
-          <p>
-            Your registration is complete.Your emailId will ne your username. You can now proceed to the Home page.
-          </p>
+          <p>Your registration is complete. You can now proceed to the Home page.</p>
           <button onClick={() => navigate("/home")}>Proceed to Home</button>
         </div>
       ) : (
@@ -193,7 +220,7 @@ const RegistrationPage = () => {
               <select
                 id="gender"
                 name="gender"
-                value={gender}                
+                value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
                 <option value="">Select Gender</option>
@@ -202,7 +229,7 @@ const RegistrationPage = () => {
                 <option value="other">Other</option>
               </select>
             </div>
-            <button type="submit">REGISTER</button>             
+            <button type="submit">REGISTER</button>
           </form>
           {error && <p className="error">{error}</p>}
         </div>
