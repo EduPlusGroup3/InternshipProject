@@ -1,47 +1,76 @@
 import React, { useState } from "react";
-import "../assests/styles/loginmodelstyles.css"; 
-import dummyUsers from "../dummydata/logindummydata";
+import "../assests/styles/loginmodelstyles.css";
 import ForgotPasswordModal from "./forgotpassword";
+import { getDatabase, ref, get, child } from "firebase/database";
 import close from "../assests/images/close.png";
 import { useNavigate } from "react-router-dom";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 
-const LoginModal = ({ isOpen, onClose, onLogin , openForgotModal }) => {
+const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
   const navigate = useNavigate();
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState("user"); 
+  const [selectedRole, setSelectedRole] = useState("user");
   const [error, setError] = useState("");
 
-  if (!isOpen) return null; 
+  if (!isOpen) return null;
 
   const closeForgotModal = () => {
     setIsForgotModalOpen(false);
   };
 
   const handleForgotPassword = () => {
-    openForgotModal(); 
+    openForgotModal();
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
-    // Simulate user authentication
-    const user = dummyUsers.find((user) => user.username === username);
-
-    if (user && user.password === password) {
-      onLogin({ ...user, role: selectedRole });
-      setError("");
-      onClose(); // Close the modal
-      setUsername("");
-      setPassword("");
-      setSelectedRole("user"); // Reset the role to the default after login
-      navigate("/userhp");
-    } else {
+  
+    const auth = getAuth();
+  
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, username, password);
+      const user = userCredential.user;
+  
+      // Check if the user role matches the role in the database
+      const userRole = await getUserRoleFromDatabase(user.uid); // Implement this function to get the role from your database
+  //  console.log(userRole);
+  //  console.log(selectedRole);
+      if (userRole === selectedRole) {
+        onLogin({ username: user.email, role: selectedRole }); // Adjust this based on your user data structure
+        setError("");
+        onClose(); // Close the modal
+        setUsername("");
+        setPassword("");
+        setSelectedRole("user"); // Reset the role to the default after login
+        navigate("/userhp");
+      } else {
+        setError("Invalid user role");
+      }
+    } catch (error) {
       setError("Invalid username or password");
     }
   };
+  
+  const getUserRoleFromDatabase = async (uid) => {
+    const database = getDatabase();
+    const userRoleRef = ref(database, `users/${uid}/role`);
+  
+    try {
+      const userRoleSnapshot = await get(userRoleRef);
+      if (userRoleSnapshot.exists()) {
+        return userRoleSnapshot.val();
+      }
+      return null; // User role not found
+    } catch (error) {
+      console.error("Error getting user role from database:", error);
+      return null; // Handle the error as needed
+    }
+  };
+  
+  
 
   return (
     <div className="modal-overlay">
@@ -91,19 +120,15 @@ const LoginModal = ({ isOpen, onClose, onLogin , openForgotModal }) => {
         </form>
         {error && <p className="error">{error}</p>}
         <div className="extra-links">
-          <a href="#" onClick={handleForgotPassword}>Forgot Password?</a>
+          <a href="#" onClick={handleForgotPassword}>
+            Forgot Password?
+          </a>
           <span>|</span>
           <a href="/register">Create New Account</a>
         </div>
-        <img
-          src={close}  
-          alt="Close"
-          className="close-image"
-          onClick={onClose}          
-        />
+        <img src={close} alt="Close" className="close-image" onClick={onClose} />
       </div>
       <ForgotPasswordModal isOpen={isForgotModalOpen} onClose={closeForgotModal} />
-
     </div>
   );
 };

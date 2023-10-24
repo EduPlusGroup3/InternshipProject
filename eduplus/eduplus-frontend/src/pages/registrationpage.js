@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../assests/styles/registrationpagestyles.css"
+import "../assests/styles/registrationpagestyles.css";
 import countriesList from '../dummydata/countries';
-import {database} from '../firebase'
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { getDatabase, ref, set, get } from "firebase/database";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const RegistrationPage = () => {
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [email, setEmail] = useState("");  
+  const [email, setEmail] = useState("");
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [gender, setGender] = useState("");
@@ -32,19 +32,19 @@ const RegistrationPage = () => {
       !lastname ||
       !password ||
       !confirmPassword ||
-      !email ||      
+      !email ||
       !country ||
       !region ||
       !gender
     ) {
       setError("All fields are required");
     } else if (password !== confirmPassword) {
-      setError("Passwords do not match");    
+      setError("Passwords do not match");
     } else if (await isEmailAlreadyRegistered(email)) {
       setError("Email address is already registered.");
     } else {
-      //setIsRegistered(true);
-      registerUser();  // Register the user in Firestore
+      // setIsRegistered(true);
+      registerUser(); // Register the user in Firebase Realtime Database
     }
   };
 
@@ -62,26 +62,46 @@ const RegistrationPage = () => {
   };
 
   const isEmailAlreadyRegistered = async (emailToCheck) => {
-    const userRef = collection(database, "users");
-    const q = query(userRef, where("email", "==", emailToCheck));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.size > 0;
+    const database = getDatabase();
+    const usersRef = ref(database, "users");
+    
+    // Query the database to check if the email exists
+    const snapshot = await get(usersRef);
+    
+    if (snapshot.exists()) {
+      const userData = snapshot.val();
+      for (const userId in userData) {
+        if (userData[userId].email === emailToCheck) {
+          return true; // Email already registered
+        }
+      }
+    }
+    
+    return false; // Email not registered
   };
-  
-  const registerUser = async () => {
-    try {
-      const userRef = collection(database, "users");
-      const newUser = {
-        firstname,       
-        email,
-        country,
-        region,
-        gender,
-        password
-      };
-      const docRef = await addDoc(userRef, newUser);
 
-      if (docRef.id) {
+  const registerUser = async () => {
+    const auth = getAuth();
+
+    try {
+      // Create a new user in Firebase Authentication
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+
+      if (user) {
+        // User successfully created in Firebase Authentication, now save additional data in Realtime Database
+        const database = getDatabase();
+        const usersRef = ref(database, "users/" + user.uid);
+        const newUser = {
+          role:"parent",
+          uid:user.uid,
+          firstname,
+          email,
+          country,
+          region,
+          gender,
+        };
+        await set(usersRef, newUser);
+
         setIsRegistered(true);
       }
     } catch (error) {
@@ -95,9 +115,7 @@ const RegistrationPage = () => {
       {isRegistered ? (
         <div className="registration-success">
           <h2>Registration Successful!</h2>
-          <p>
-            Your registration is complete.Your emailId will ne your username. You can now proceed to the Home page.
-          </p>
+          <p>Your registration is complete. Your emailId will be your username. You can now proceed to the Home page.</p>
           <button onClick={() => navigate("/home")}>Proceed to Home</button>
         </div>
       ) : (
@@ -158,7 +176,7 @@ const RegistrationPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-            </div>            
+            </div>
             <div className="form-group">
               <label htmlFor="country">Country<span className="asteriskColor">*</span></label>
               <select
@@ -168,13 +186,13 @@ const RegistrationPage = () => {
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
               >
-              <option value="">Select Country</option>
-              {countriesList.map((countryOption) => (
-                <option key={countryOption} value={countryOption}>
-                  {countryOption}
-                </option>
-              ))}
-            </select>
+                <option value="">Select Country</option>
+                {countriesList.map((countryOption) => (
+                  <option key={countryOption} value={countryOption}>
+                    {countryOption}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label htmlFor="region">State/Province</label>
@@ -192,7 +210,7 @@ const RegistrationPage = () => {
               <select
                 id="gender"
                 name="gender"
-                value={gender}                
+                value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
                 <option value="">Select Gender</option>
@@ -201,7 +219,7 @@ const RegistrationPage = () => {
                 <option value="other">Other</option>
               </select>
             </div>
-            <button type="submit">REGISTER</button>             
+            <button type="submit">REGISTER</button>
           </form>
           {error && <p className="error">{error}</p>}
         </div>
