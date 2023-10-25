@@ -95,6 +95,7 @@ const RegistrationPage = () => {
           role:"parent",
           uid:user.uid,
           firstname,
+          lastname,
           email,
           country,
           region,
