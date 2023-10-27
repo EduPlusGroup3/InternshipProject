@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchUserProfileData } from "./UserPage"; // Import the function to fetch user data
+import { fetchUserProfileData } from "./firebaseFunctions"; // Import the function to fetch user data
 import { useAuth } from "../pages/authcontext"; // Import the useAuth hook
 
 const UserProfile = () => {
@@ -67,13 +67,14 @@ const UserProfile = () => {
         </div>
         <div className="form-group">
           <label htmlFor="country">Country</label>
-          <select
+          <input
+            type="text"
             id="country"
             name="country"
             placeholder="Country"
             value={userData.country}
             readOnly
-          ></select>
+          />
         </div>
         <div className="form-group">
           <label htmlFor="region">Region</label>
@@ -88,7 +89,14 @@ const UserProfile = () => {
         </div>
         <div className="form-group">
           <label htmlFor="gender">Gender</label>
-          <select id="gender" name="gender" value={userData.gender} readOnly></select>
+          <input
+            type="text"
+            id="gender"
+            name="gender"
+            placeholder="Gender"
+            value={userData.gender}
+            readOnly
+          />
         </div>
       </form>
     </div>

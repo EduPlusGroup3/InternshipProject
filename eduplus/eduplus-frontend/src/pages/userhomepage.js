@@ -26,7 +26,7 @@ const UserHomePage = () => {
   const [isClassesPreferOpen, setIsClassesPreferOpen] = useState(false);
   const [ismyClassesOpen, setIsMyClassesOpen] = useState(false);
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
-  const [profileData, setProfileData] = useState(null); // State to store user profile data
+  const [profileData, setProfileData] = useState(null);
 
   useEffect(() => {
     setActiveLink("home");
@@ -54,11 +54,18 @@ const UserHomePage = () => {
   };
 
   const fetchUserProfileData = async (uid) => {
+    if (!uid) {
+      console.error("UID is not defined.");
+      console.log("CHECK"+currentUser.uid);
+      return;
+    }
+
     const database = getDatabase();
     const userRef = ref(database, `users/${uid}`);
 
     try {
-      console.log("Fetching user data...");
+      console.log("Fetching user data for UID: " + uid);
+      console.log("CHECK"+currentUser.uid);
       const userSnapshot = await get(userRef);
       if (userSnapshot.exists()) {
         const userData = userSnapshot.val();
@@ -134,7 +141,10 @@ const UserHomePage = () => {
   ];
 
   const isParent = currentUser && currentUser.role === 'parent';
-
+ // Update the onLogin function to include the UID
+ const handleLogin = (userData) => {
+  login(userData);
+};
   return (
     <div className="user-home-page">
       <header className="header">
@@ -231,7 +241,8 @@ const UserHomePage = () => {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={closeLoginModal}
-        onLogin={login}
+      
+        onLogin={handleLogin} // Pass the function to LoginModal
         openForgotModal={openForgotModal}
       />
       <ForgotPasswordModal isOpen={isForgotModalOpen} onClose={closeForgotModal} />

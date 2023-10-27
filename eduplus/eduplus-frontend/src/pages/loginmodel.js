@@ -39,7 +39,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
   //  console.log(userRole);
   //  console.log(selectedRole);
       if (userRole === selectedRole) {
-        onLogin({ username: user.email, role: selectedRole }); // Adjust this based on your user data structure
+        onLogin({ username: user.email, role: selectedRole,uid:user.uid }); // Adjust this based on your user data structure
         setError("");
         onClose(); // Close the modal
         setUsername("");

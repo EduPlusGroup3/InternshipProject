@@ -1,26 +1,31 @@
-// Import the necessary Firebase database functions
-import { getDatabase, ref, get } from "firebase/database";
+import React, { useEffect, useState } from "react";
+import UserProfile from "./userprofile";
+import { useAuth } from "../authcontext"; // Import the useAuth hook
+import { fetchUserProfileData } from "./firebaseFunctions"; // Import the function to fetch user data
 
-// Create a function to fetch user profile data from Firebase
-export const fetchUserProfileData = async (uid) => {
-  const database = getDatabase();
-  const userRef = ref(database, `Users/${uid}`);
-  try {
-    const userSnapshot = await get(userRef);
-    if (userSnapshot.exists()) {
-      const userData = userSnapshot.val();
-      console.log("Fetched user data:", userData); // Log the fetched data
-      return {
-        firstname: userData.firstname || "",
-        lastname: userData.lastname || "",
-        email: userData.email || "",
-        country: userData.country || "",
-        region: userData.region || "",
-        gender: userData.gender || "",
-      };
+const UserHomePage = () => {
+  const { currentUser } = useAuth();
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    if (currentUser) {
+      const uid = currentUser.uid;
+      fetchUserProfileData(uid)
+        .then((data) => {
+          setUserData(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user profile data:", error);
+        });
     }
-  } catch (error) {
-    console.error("Error fetching user profile data:", error);
-  }
-  return null; // Return null if data retrieval fails
+  }, [currentUser]);
+
+  return (
+    <div>
+      <h1>User Home Page</h1>
+      {userData && <UserProfile userData={userData} />}
+    </div>
+  );
 };
+
+export default UserHomePage;
