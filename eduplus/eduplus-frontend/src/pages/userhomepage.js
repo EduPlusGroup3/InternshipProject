@@ -3,7 +3,7 @@ import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
 import { useNavigate } from "react-router-dom";
 import MyClasses from "./myclasses";
-import Enquiry from "./enquiry";
+import EnquiryModal from "./EnquiryModal"; // Import the EnquiryModal component
 import ClassesPreferred from "./classespreferred";
 import ForgotPasswordModal from "./forgotpassword";
 import "../assests/styles/userhomepagestyles.css";
@@ -12,7 +12,7 @@ import genioLogoFooter from "../assests/images/genioLogoFooter.png";
 import VerticalMenu from "./verticalmenu";
 import { useAuth } from "../pages/authcontext";
 import dummyClassesData from "../dummydata/classesAttended";
-import { getDatabase, ref, get } from "firebase/database"; // Import Firebase database modules
+import { getDatabase, ref, get } from "firebase/database";
 import { getAuth } from "firebase/auth";
 
 const UserHomePage = () => {
@@ -27,6 +27,8 @@ const UserHomePage = () => {
   const [ismyClassesOpen, setIsMyClassesOpen] = useState(false);
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
+
+  const [uid, setUid] = useState(null);
 
   useEffect(() => {
     setActiveLink("home");
@@ -56,7 +58,6 @@ const UserHomePage = () => {
   const fetchUserProfileData = async (uid) => {
     if (!uid) {
       console.error("UID is not defined.");
-      console.log("CHECK"+currentUser.uid);
       return;
     }
 
@@ -64,15 +65,11 @@ const UserHomePage = () => {
     const userRef = ref(database, `users/${uid}`);
 
     try {
-      console.log("Fetching user data for UID: " + uid);
-      console.log("CHECK"+currentUser.uid);
       const userSnapshot = await get(userRef);
       if (userSnapshot.exists()) {
         const userData = userSnapshot.val();
-        console.log("User data retrieved:", userData);
         setProfileData(userData);
       } else {
-        console.log("User data does not exist.");
         setProfileData(null);
       }
     } catch (error) {
@@ -85,6 +82,7 @@ const UserHomePage = () => {
     if (isProfileOpen && currentUser) {
       const uid = currentUser.uid;
       fetchUserProfileData(uid);
+      setUid(uid);
     }
   }, [isProfileOpen, currentUser]);
 
@@ -106,6 +104,7 @@ const UserHomePage = () => {
       setIsEnquiryOpen(false);
       setIsMyClassesOpen(true);
     } else if (link === "enquiry") {
+      console.log("Enquiry link clicked");
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
       setIsEnquiryOpen(true);
@@ -141,10 +140,12 @@ const UserHomePage = () => {
   ];
 
   const isParent = currentUser && currentUser.role === 'parent';
- // Update the onLogin function to include the UID
- const handleLogin = (userData) => {
-  login(userData);
-};
+
+  const handleLogin = (userData) => {
+    login(userData);
+    setUid(userData.uid);
+  };
+
   return (
     <div className="user-home-page">
       <header className="header">
@@ -207,12 +208,14 @@ const UserHomePage = () => {
             isProfileOpen={isProfileOpen}
             onClose={closeProfileModal}
             username={username}
-            profileData={profileData} // Pass the user data to UserProfile component
+            profileData={profileData}
           />}
           {isClassesPreferOpen && (
             <ClassesPreferred onClose={closeClassesPreferModal} username={username} />
           )}
-          {isEnquiryOpen && <Enquiry onClose={closeEnquiryModal} username={username} />}
+          {isEnquiryOpen && (
+            <EnquiryModal onClose={closeEnquiryModal} username={username} uid={uid} />
+          )}
           {ismyClassesOpen && (
             <MyClasses onClose={closeMyClassesModal} username={username} classesData={dummyClassesData} />
           )}
@@ -241,8 +244,7 @@ const UserHomePage = () => {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={closeLoginModal}
-      
-        onLogin={handleLogin} // Pass the function to LoginModal
+        onLogin={handleLogin}
         openForgotModal={openForgotModal}
       />
       <ForgotPasswordModal isOpen={isForgotModalOpen} onClose={closeForgotModal} />
