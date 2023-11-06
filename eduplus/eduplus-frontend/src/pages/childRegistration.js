@@ -1,11 +1,13 @@
 
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assests/styles/registrationpagestyles.css"
 import countriesList from '../dummydata/countries';
-import {database} from '../firebase'
+//import {database} from '../firebase'
 import { useAuth } from "../pages/authcontext";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+//import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { getDatabase, ref, set, get } from "firebase/database";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 const ChildRegistrationPage = () => {
   const navigate = useNavigate();
@@ -35,14 +37,14 @@ const ChildRegistrationPage = () => {
 
     if (
       !firstname ||
-      // !lastname ||
+      !lastname ||
       !password ||
       !confirmPassword ||
-      // !email ||
+      //!email ||
       !dob ||
       !grade ||
       !country ||
-      // !region ||
+      !region ||
       !gender
     ) {
       setError("Kinldy fill all the mandatory fields!");
@@ -50,11 +52,18 @@ const ChildRegistrationPage = () => {
       setError("Passwords do not match");
     } else if (!isAgeValid(dob)) {
       setError("You must be at least 6 years old to register.");
-    } else if (await isEmailAlreadyRegistered(email)) {
-      setError("Email address is already registered.");
     } else {
-      //setIsRegistered(true);
-      registerUser();  // Register the user in Firestore
+      // Construct the email address using firstname
+      const constructedEmail = `${firstname}@eduplus.com`;
+      if (await isUserAlreadyRegistered(constructedEmail)) {
+        setError("Email address is already registered.");
+      } else {
+        // Set the email field with the constructed email
+        setEmail(constructedEmail);
+        // Continue with registration
+        registerUser();
+        setError("Email address is already registered.");
+      }
     }
   };
 
@@ -71,30 +80,58 @@ const ChildRegistrationPage = () => {
     return age >= 6;
   };
 
+  /*
   const isEmailAlreadyRegistered = async (emailToCheck) => {
     const userRef = collection(database, "users");
     const q = query(userRef, where("email", "==", emailToCheck));
     const querySnapshot = await getDocs(q);
     return querySnapshot.size > 0;
   };
-  
-  const registerUser = async () => {
-    try {
-      const userRef = collection(database, "users");
-      const newUser = {
-        firstname,
-        // lastname,
-        email,
-        dob,
-        grade,
-        country,
-        // region,
-        gender,
-        password
-      };
-      const docRef = await addDoc(userRef, newUser);
+  */
 
-      if (docRef.id) {
+  const isUserAlreadyRegistered = async (emailToCheck) => {
+    const database = getDatabase();
+    const usersRef = ref(database, "child");
+
+    // Query the database to check if the email exists
+    const snapshot = await get(usersRef);
+
+    if (snapshot.exists()) {
+      const userData = snapshot.val();
+      for (const userId in userData) {
+        if (userData[userId].email === emailToCheck) {
+          return true; // Email already registered
+        }
+      }
+    }
+
+    return false; // Email not registered
+  };
+
+
+  const registerUser = async () => {
+    const auth = getAuth();
+    try {
+      // Create a new user in Firebase Authentication
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      if(user)
+      {
+        const database = getDatabase();
+        const usersRef = ref(database, "child/" + user.uid);
+        const newUser = {
+          role: "student",
+          uid: user.uid,
+          firstname,
+          lastname,
+          email,
+          dob,
+          grade,
+          country,
+          region,
+          gender,
+          password
+        };
+        await set(usersRef, newUser);
         setIsRegistered(true);
       }
     } catch (error) {
@@ -202,13 +239,13 @@ const ChildRegistrationPage = () => {
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
               >
-              <option value="">Select Country</option>
-              {countriesList.map((countryOption) => (
-                <option key={countryOption} value={countryOption}>
-                  {countryOption}
-                </option>
-              ))}
-            </select>
+                <option value="">Select Country</option>
+                {countriesList.map((countryOption) => (
+                  <option key={countryOption} value={countryOption}>
+                    {countryOption}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label htmlFor="region">State/Province</label>
@@ -226,7 +263,7 @@ const ChildRegistrationPage = () => {
               <select
                 id="gender"
                 name="gender"
-                value={gender}                
+                value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
                 <option value="">Select Gender</option>
@@ -235,7 +272,7 @@ const ChildRegistrationPage = () => {
                 <option value="other">Other</option>
               </select>
             </div>
-            <button type="submit">REGISTER</button>             
+            <button type="submit">REGISTER</button>
           </form>
           {error && <p className="error">{error}</p>}
         </div>
