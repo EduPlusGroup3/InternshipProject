@@ -1,14 +1,16 @@
 
 import React, { useState,useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "../assests/styles/registrationpagestyles.css"
 import countriesList from '../dummydata/countries';
-import {database} from '../firebase'
-import { useAuth } from "../pages/authcontext";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { ref, set, getDatabase } from "firebase/database";
+import { useAuth } from "./authcontext";
+
 
 const ChildRegistrationPage = () => {
+  
   const navigate = useNavigate();
+  const { user, auth } = useAuth();
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
@@ -29,77 +31,55 @@ const ChildRegistrationPage = () => {
     setCountries(countriesList);
   }, []);
 
-
   const handleRegistration = async (e) => {
     e.preventDefault();
 
     if (
       !firstname ||
-      // !lastname ||
       !password ||
       !confirmPassword ||
-      // !email ||
       !dob ||
       !grade ||
       !country ||
-      // !region ||
       !gender
     ) {
-      setError("Kinldy fill all the mandatory fields!");
+      setError("Kindly fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
-    } else if (!isAgeValid(dob)) {
-      setError("You must be at least 6 years old to register.");
-    } else if (await isEmailAlreadyRegistered(email)) {
-      setError("Email address is already registered.");
     } else {
-      //setIsRegistered(true);
-      registerUser();  // Register the user in Firestore
-    }
-  };
+      try {
+        // Create a new user with email and password
+        const { email } = user; // Get the parent's email
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
 
-  const isAgeValid = (dateOfBirth) => {
-    const currentDate = new Date();
-    const birthDate = new Date(dateOfBirth);
-    const age = currentDate.getFullYear() - birthDate.getFullYear();
-    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+        if (credential) {
+          const { uid } = credential.user;
 
-    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
-      return age - 1 >= 6;
-    }
+          // Construct the path for saving child information
+          const childInfoPath = `users/child/${uid}/information`;
 
-    return age >= 6;
-  };
+          // Create a reference to the Firebase Realtime Database
+          const database = getDatabase();
 
-  const isEmailAlreadyRegistered = async (emailToCheck) => {
-    const userRef = collection(database, "users");
-    const q = query(userRef, where("email", "==", emailToCheck));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.size > 0;
-  };
-  
-  const registerUser = async () => {
-    try {
-      const userRef = collection(database, "users");
-      const newUser = {
-        firstname,
-        // lastname,
-        email,
-        dob,
-        grade,
-        country,
-        // region,
-        gender,
-        password
-      };
-      const docRef = await addDoc(userRef, newUser);
+          // Define the data to be saved
+          const childInfo = {
+            firstname,
+            dob,
+            grade,
+            country,
+            gender,
+          };
 
-      if (docRef.id) {
-        setIsRegistered(true);
+          // Save the child's information under the specified path
+          await set(ref(database, childInfoPath), childInfo);
+
+          // Registration successful, you can redirect the user
+          navigate("/home");
+        }
+      } catch (error) {
+        console.error("Error registering child:", error);
+        setError("Registration failed. Please try again later.");
       }
-    } catch (error) {
-      console.error("Error registering user:", error);
-      setError("Registration failed. Please try again later.");
     }
   };
 
