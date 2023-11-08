@@ -18,6 +18,7 @@ const ChildRegistrationPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userID, setUserId] = useState("");
+  const [email, setEmail] = useState("");
   const [dob, setDOB] = useState("");
   const [grade, setGrade] = useState("");
   const [country, setCountry] = useState("");
@@ -70,15 +71,14 @@ const ChildRegistrationPage = () => {
       setError("You must be at least 6 years old to register.");
     } else {
       // Construct the email address using firstname
-      const constructedEmail = `${firstname}@eduplus.com`;
+      const constructedEmail = `${userID}@eduplus.com`;
       if (await isUserAlreadyRegistered(constructedEmail)) {
-        setError("Email address is already registered.");
+        setError("This UserId is already taken, please choose another.");
       } else {
         // Set the email field with the constructed email
         setEmail(constructedEmail);
         // Continue with registration
         registerUser(currentUser.uid);
-        setError("Email address is already registered.");
         }
     }
   };
