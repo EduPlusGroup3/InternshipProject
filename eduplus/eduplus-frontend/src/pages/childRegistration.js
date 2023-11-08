@@ -19,7 +19,6 @@ const ChildRegistrationPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userID, setUserId] = useState("");
   const [email, setEmail] = useState("");
-  const [isEmailMissing, setIsEmailMissing] = useState(false); // New state
   const [dob, setDOB] = useState("");
   const [grade, setGrade] = useState("");
   const [country, setCountry] = useState("");
@@ -31,15 +30,6 @@ const ChildRegistrationPage = () => {
   const { username: loggedInUserEmail } = useAuth();
 
   useEffect(() => {
-    // Whenever the email state changes, check if it's missing
-    if (!email) {
-      setIsEmailMissing(true);
-    } else {
-      setIsEmailMissing(false);
-    }
-  }, [email]);
-  useEffect(() => {
-    
     // Use the countriesList from the imported file
     setCountries(countriesList);
   }, []);
@@ -59,23 +49,13 @@ const ChildRegistrationPage = () => {
 
   const handleRegistration = async (e) => {
     e.preventDefault();
-  // Trim leading and trailing spaces from the username
-  const trimmedUserID = userID.trim();
-  // Check if the username contains spaces
-  if (trimmedUserID.includes(' ')) {
-    setError("Username cannot contain spaces. Please choose a different username.");
-    return;
-  }
+
     if (
       !firstname ||
       // !lastname ||
       !password ||
       !confirmPassword ||
-<<<<<<< HEAD
-=======
-      !trimmedUserID || // Use the trimmed username for validation
       !userID ||
->>>>>>> db06c098879a1cff8d72f3df4f7996397437701a
       !dob ||
       !grade ||
       !country ||
@@ -85,65 +65,37 @@ const ChildRegistrationPage = () => {
       setError("Kinldy fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
-<<<<<<< HEAD
-    } else {
-      try {
-        // Create a new user with email and password
-        const { email } = user; // Get the parent's email
-        const credential = await createUserWithEmailAndPassword(auth, email, password);
-=======
-    } else if (trimmedUserID.length > 8) {
+    } else if (userID.length > 8) {
       setError("Username must be at most 8 characters long");
     } else if (!isAgeValid(dob)) {
       setError("You must be at least 6 years old to register.");
     } else {
       // Construct the email address using firstname
-      const constructedEmail = `${trimmedUserID}@eduplus.com`;
-      setEmail(constructedEmail);
+      const constructedEmail = `${userID}@eduplus.com`;
       if (await isUserAlreadyRegistered(constructedEmail)) {
         setError("This UserId is already taken, please choose another.");
       } else {
         // Set the email field with the constructed email
-        
-      console.log("Email Value Before Registration:", email); // Debugging line
-        // Set the email field with the constructed email
-       
+        setEmail(constructedEmail);
         // Continue with registration
-      registerUser(currentUser.uid);
+        registerUser(currentUser.uid);
         }
     }
   };
->>>>>>> db06c098879a1cff8d72f3df4f7996397437701a
 
-        if (credential) {
-          const { uid } = credential.user;
+  const isAgeValid = (dateOfBirth) => {
+    const currentDate = new Date();
+    const birthDate = new Date(dateOfBirth);
+    const age = currentDate.getFullYear() - birthDate.getFullYear();
+    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
 
-          // Construct the path for saving child information
-          const childInfoPath = `users/child/${uid}/information`;
+    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
+      return age - 1 >= 6;
+    }
 
-          // Create a reference to the Firebase Realtime Database
-          const database = getDatabase();
+    return age >= 6;
+  };
 
-<<<<<<< HEAD
-          // Define the data to be saved
-          const childInfo = {
-            firstname,
-            dob,
-            grade,
-            country,
-            gender,
-          };
-
-          // Save the child's information under the specified path
-          await set(ref(database, childInfoPath), childInfo);
-
-          // Registration successful, you can redirect the user
-          navigate("/home");
-        }
-      } catch (error) {
-        console.error("Error registering child:", error);
-        setError("Registration failed. Please try again later.");
-=======
   /*
   const isEmailAlreadyRegistered = async (emailToCheck) => {
     const userRef = collection(database, "users");
@@ -174,11 +126,6 @@ const ChildRegistrationPage = () => {
   const registerUser = async (currentUserUid) => {
     const auth = getAuth();
     try {
-       // Ensure the email is set properly
-    if (!email) {
-      setError("Email is missing. Please try again.");
-      return;
-    }
       // Create a new user in Firebase Authentication
       console.log("email value is :", email);
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
@@ -203,8 +150,10 @@ const ChildRegistrationPage = () => {
         };
         await set(usersRef, newUser);
         setIsRegistered(true);
->>>>>>> db06c098879a1cff8d72f3df4f7996397437701a
       }
+    } catch (error) {
+      console.error("Error registering user:", error);
+      setError("Registration failed. Please try again later.");
     }
   };
 
