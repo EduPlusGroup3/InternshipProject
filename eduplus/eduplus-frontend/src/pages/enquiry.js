@@ -87,6 +87,8 @@ const EnquiryModal = ({ onClose }) => {
       
       console.log("Enquiry sent:", { email, contactNo, country, subject, message });
 
+      alert("Enquiry successfully sent to the admin");
+
       // Clear form fields
       setEmail("");
       setContactNo("");
