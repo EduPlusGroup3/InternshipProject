@@ -1,21 +1,25 @@
-
-import React, { useState,useEffect } from "react";
-import countriesList from '../dummydata/countries';
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { ref, set, getDatabase } from "firebase/database";
-import { useAuth } from "./authcontext";
-
+import "../assests/styles/registrationpagestyles.css";
+import countriesList from '../dummydata/countries';
+import {database} from '../firebase'
+import { getDatabase, ref, set, get } from "firebase/database";
+import { useAuth } from "../pages/authcontext";
+//import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { fetchUserProfileData } from "./firebaseFunctions"; // Import the function to fetch user data
 
 const ChildRegistrationPage = () => {
-  
   const navigate = useNavigate();
-  const { user, auth } = useAuth();
+  const { currentUser } = useAuth();
+  const [userData, setUserData] = useState(null);
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [userID, setUserId] = useState("");
   const [email, setEmail] = useState("");
+  const [isEmailMissing, setIsEmailMissing] = useState(false); // New state
   const [dob, setDOB] = useState("");
   const [grade, setGrade] = useState("");
   const [country, setCountry] = useState("");
@@ -27,59 +31,155 @@ const ChildRegistrationPage = () => {
   const { username: loggedInUserEmail } = useAuth();
 
   useEffect(() => {
+    // Whenever the email state changes, check if it's missing
+    if (!email) {
+      setIsEmailMissing(true);
+    } else {
+      setIsEmailMissing(false);
+    }
+  }, [email]);
+  useEffect(() => {
+    
     // Use the countriesList from the imported file
     setCountries(countriesList);
   }, []);
 
+  useEffect(() => {
+    if (currentUser) {
+      const uid = currentUser.uid;
+      fetchUserProfileData(uid)
+        .then((data) => {
+          setUserData(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user profile data:", error);
+        });
+    }
+  }, [currentUser]);
+
   const handleRegistration = async (e) => {
     e.preventDefault();
-
+  // Trim leading and trailing spaces from the username
+  const trimmedUserID = userID.trim();
+  // Check if the username contains spaces
+  if (trimmedUserID.includes(' ')) {
+    setError("Username cannot contain spaces. Please choose a different username.");
+    return;
+  }
     if (
       !firstname ||
+      // !lastname ||
       !password ||
       !confirmPassword ||
+      !trimmedUserID || // Use the trimmed username for validation
+      !userID ||
       !dob ||
       !grade ||
       !country ||
+      // !region ||
       !gender
     ) {
-      setError("Kindly fill all the mandatory fields!");
+      setError("Kinldy fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
+    } else if (trimmedUserID.length > 8) {
+      setError("Username must be at most 8 characters long");
+    } else if (!isAgeValid(dob)) {
+      setError("You must be at least 6 years old to register.");
     } else {
-      try {
-        // Create a new user with email and password
-        const { email } = user; // Get the parent's email
-        const credential = await createUserWithEmailAndPassword(auth, email, password);
-
-        if (credential) {
-          const { uid } = credential.user;
-
-          // Construct the path for saving child information
-          const childInfoPath = `users/child/${uid}/information`;
-
-          // Create a reference to the Firebase Realtime Database
-          const database = getDatabase();
-
-          // Define the data to be saved
-          const childInfo = {
-            firstname,
-            dob,
-            grade,
-            country,
-            gender,
-          };
-
-          // Save the child's information under the specified path
-          await set(ref(database, childInfoPath), childInfo);
-
-          // Registration successful, you can redirect the user
-          navigate("/home");
+      // Construct the email address using firstname
+      const constructedEmail = `${trimmedUserID}@eduplus.com`;
+      setEmail(constructedEmail);
+      if (await isUserAlreadyRegistered(constructedEmail)) {
+        setError("This UserId is already taken, please choose another.");
+      } else {
+        // Set the email field with the constructed email
+        
+      console.log("Email Value Before Registration:", email); // Debugging line
+        // Set the email field with the constructed email
+       
+        // Continue with registration
+      registerUser(currentUser.uid);
         }
-      } catch (error) {
-        console.error("Error registering child:", error);
-        setError("Registration failed. Please try again later.");
+    }
+  };
+
+  const isAgeValid = (dateOfBirth) => {
+    const currentDate = new Date();
+    const birthDate = new Date(dateOfBirth);
+    const age = currentDate.getFullYear() - birthDate.getFullYear();
+    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
+      return age - 1 >= 6;
+    }
+
+    return age >= 6;
+  };
+
+  /*
+  const isEmailAlreadyRegistered = async (emailToCheck) => {
+    const userRef = collection(database, "users");
+    const q = query(userRef, where("email", "==", userIDToCheck));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.size > 0;
+  };
+ */
+  const isUserAlreadyRegistered = async (emailToCheck) => {
+    const database = getDatabase();
+    const usersRef = ref(database, "child");
+
+    // Query the database to check if the email exists
+    const snapshot = await get(usersRef);
+
+    if (snapshot.exists()) {
+      const userData = snapshot.val();
+      for (const userId in userData) {
+        if (userData[userId].email === emailToCheck) {
+          return true; // Email already registered
+        }
       }
+    }
+    return false; // Email not registered
+  };
+
+
+  const registerUser = async (currentUserUid) => {
+    const auth = getAuth();
+    try {
+       // Ensure the email is set properly
+    if (!email) {
+      setError("Email is missing. Please try again.");
+      return;
+    }
+      // Create a new user in Firebase Authentication
+      console.log("email value is :", email);
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      //const userRef = collection(database, "users");
+      if(user)
+      {
+        const database = getDatabase();
+        const usersRef = ref(database, "child/" + user.uid);
+        const newUser = {
+          role: "student",
+          uid: user.uid,
+          firstname,
+          lastname,
+          email,
+          dob,
+          grade,
+          country,
+          region,
+          gender,
+          password,
+          parentUid: currentUserUid, // Store the parent's UID
+        };
+        await set(usersRef, newUser);
+        setIsRegistered(true);
+      }
+    } catch (error) {
+      console.error("Error registering user:", error);
+      setError("Registration failed. Please try again later.");
     }
   };
 
@@ -142,14 +242,15 @@ const ChildRegistrationPage = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="email">Email<span className="asteriskColor">*</span></label>
+              <label htmlFor="userID">Username<span className="asteriskColor">*</span></label>
               <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Email"
-                value={loggedInUserEmail}
-                readOnly
+                type="username"
+                id="username"
+                name="username"
+                placeholder="Username"
+                value={userID}
+                maxLength="8"  
+                onChange={(e) => setUserId(e.target.value)}             
               />
             </div>
             <div className="form-group">
@@ -182,21 +283,21 @@ const ChildRegistrationPage = () => {
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
               >
-              <option value="">Select Country</option>
-              {countriesList.map((countryOption) => (
-                <option key={countryOption} value={countryOption}>
-                  {countryOption}
-                </option>
-              ))}
-            </select>
+                <option value="">Select Country</option>
+                {countriesList.map((countryOption) => (
+                  <option key={countryOption} value={countryOption}>
+                    {countryOption}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
-              <label htmlFor="region">State/Province</label>
+              <label htmlFor="region">Region</label>
               <input
                 type="text"
                 id="region"
                 name="region"
-                placeholder="State/Province"
+                placeholder="Region"
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
               />
@@ -206,7 +307,7 @@ const ChildRegistrationPage = () => {
               <select
                 id="gender"
                 name="gender"
-                value={gender}                
+                value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
                 <option value="">Select Gender</option>
@@ -215,7 +316,7 @@ const ChildRegistrationPage = () => {
                 <option value="other">Other</option>
               </select>
             </div>
-            <button type="submit">REGISTER</button>             
+            <button type="submit">REGISTER</button>
           </form>
           {error && <p className="error">{error}</p>}
         </div>

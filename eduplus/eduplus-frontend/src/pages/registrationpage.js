@@ -48,19 +48,6 @@ const RegistrationPage = () => {
     }
   };
 
-  const isAgeValid = (dateOfBirth) => {
-    const currentDate = new Date();
-    const birthDate = new Date(dateOfBirth);
-    const age = currentDate.getFullYear() - birthDate.getFullYear();
-    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
-
-    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
-      return age - 1 >= 6;
-    }
-
-    return age >= 6;
-  };
-
   const isEmailAlreadyRegistered = async (emailToCheck) => {
     const database = getDatabase();
     const usersRef = ref(database, "users");
