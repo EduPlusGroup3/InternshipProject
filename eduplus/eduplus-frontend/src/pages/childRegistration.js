@@ -1,9 +1,8 @@
-
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../assests/styles/registrationpagestyles.css"
+import "../assests/styles/registrationpagestyles.css";
 import countriesList from '../dummydata/countries';
-import {database} from '../firebase'
+import { database } from '../firebase';
 import { useAuth } from "../pages/authcontext";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 
@@ -13,7 +12,7 @@ const ChildRegistrationPage = () => {
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [email, setEmail] = useState("");
+  const [userID, setUserId] = useState("");
   const [dob, setDOB] = useState("");
   const [grade, setGrade] = useState("");
   const [country, setCountry] = useState("");
@@ -29,7 +28,6 @@ const ChildRegistrationPage = () => {
     setCountries(countriesList);
   }, []);
 
-
   const handleRegistration = async (e) => {
     e.preventDefault();
 
@@ -38,7 +36,7 @@ const ChildRegistrationPage = () => {
       // !lastname ||
       !password ||
       !confirmPassword ||
-      // !email ||
+      !userID ||
       !dob ||
       !grade ||
       !country ||
@@ -48,10 +46,12 @@ const ChildRegistrationPage = () => {
       setError("Kinldy fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
+    } else if (userID.length > 8) {
+      setError("Username must be at most 8 characters long");
     } else if (!isAgeValid(dob)) {
       setError("You must be at least 6 years old to register.");
-    } else if (await isEmailAlreadyRegistered(email)) {
-      setError("Email address is already registered.");
+    } else if (await isUserIdAlreadyRegistered(userID)) {
+      setError("User ID is already registered.");
     } else {
       //setIsRegistered(true);
       registerUser();  // Register the user in Firestore
@@ -71,20 +71,20 @@ const ChildRegistrationPage = () => {
     return age >= 6;
   };
 
-  const isEmailAlreadyRegistered = async (emailToCheck) => {
+  const isUserIdAlreadyRegistered = async (userIDToCheck) => {
     const userRef = collection(database, "users");
-    const q = query(userRef, where("email", "==", emailToCheck));
+    const q = query(userRef, where("email", "==", userIDToCheck));
     const querySnapshot = await getDocs(q);
     return querySnapshot.size > 0;
   };
-  
+
   const registerUser = async () => {
     try {
       const userRef = collection(database, "users");
       const newUser = {
         firstname,
         // lastname,
-        email,
+        userID,
         dob,
         grade,
         country,
@@ -162,14 +162,15 @@ const ChildRegistrationPage = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="email">Email<span className="asteriskColor">*</span></label>
+              <label htmlFor="userID">Username<span className="asteriskColor">*</span></label>
               <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Email"
-                value={loggedInUserEmail}
-                readOnly
+                type="username"
+                id="username"
+                name="username"
+                placeholder="Username"
+                value={userID}
+                maxLength="8"  
+                onChange={(e) => setUserId(e.target.value)}             
               />
             </div>
             <div className="form-group">
@@ -202,13 +203,13 @@ const ChildRegistrationPage = () => {
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
               >
-              <option value="">Select Country</option>
-              {countriesList.map((countryOption) => (
-                <option key={countryOption} value={countryOption}>
-                  {countryOption}
-                </option>
-              ))}
-            </select>
+                <option value="">Select Country</option>
+                {countriesList.map((countryOption) => (
+                  <option key={countryOption} value={countryOption}>
+                    {countryOption}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label htmlFor="region">State/Province</label>
@@ -226,7 +227,7 @@ const ChildRegistrationPage = () => {
               <select
                 id="gender"
                 name="gender"
-                value={gender}                
+                value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
                 <option value="">Select Gender</option>
@@ -235,7 +236,7 @@ const ChildRegistrationPage = () => {
                 <option value="other">Other</option>
               </select>
             </div>
-            <button type="submit">REGISTER</button>             
+            <button type="submit">REGISTER</button>
           </form>
           {error && <p className="error">{error}</p>}
         </div>
