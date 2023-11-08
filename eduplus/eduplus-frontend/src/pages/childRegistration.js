@@ -19,6 +19,7 @@ const ChildRegistrationPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userID, setUserId] = useState("");
   const [email, setEmail] = useState("");
+  const [isEmailMissing, setIsEmailMissing] = useState(false); // New state
   const [dob, setDOB] = useState("");
   const [grade, setGrade] = useState("");
   const [country, setCountry] = useState("");
@@ -30,6 +31,15 @@ const ChildRegistrationPage = () => {
   const { username: loggedInUserEmail } = useAuth();
 
   useEffect(() => {
+    // Whenever the email state changes, check if it's missing
+    if (!email) {
+      setIsEmailMissing(true);
+    } else {
+      setIsEmailMissing(false);
+    }
+  }, [email]);
+  useEffect(() => {
+    
     // Use the countriesList from the imported file
     setCountries(countriesList);
   }, []);
@@ -49,13 +59,18 @@ const ChildRegistrationPage = () => {
 
   const handleRegistration = async (e) => {
     e.preventDefault();
-
+  // Trim leading and trailing spaces from the username
+  const trimmedUserID = userID.trim();
+  // Check if the username contains spaces
+  if (trimmedUserID.includes(' ')) {
+    setError("Username cannot contain spaces. Please choose a different username.");
+    return;
+  }
     if (
       !firstname ||
       // !lastname ||
       !password ||
       !confirmPassword ||
-      !userID ||
       !dob ||
       !grade ||
       !country ||
@@ -65,95 +80,40 @@ const ChildRegistrationPage = () => {
       setError("Kinldy fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
-    } else if (userID.length > 8) {
-      setError("Username must be at most 8 characters long");
-    } else if (!isAgeValid(dob)) {
-      setError("You must be at least 6 years old to register.");
     } else {
-      // Construct the email address using firstname
-      const constructedEmail = `${userID}@eduplus.com`;
-      if (await isUserAlreadyRegistered(constructedEmail)) {
-        setError("This UserId is already taken, please choose another.");
-      } else {
-        // Set the email field with the constructed email
-        setEmail(constructedEmail);
-        // Continue with registration
-        registerUser(currentUser.uid);
+      try {
+        // Create a new user with email and password
+        const { email } = user; // Get the parent's email
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
+
+        if (credential) {
+          const { uid } = credential.user;
+
+          // Construct the path for saving child information
+          const childInfoPath = `users/child/${uid}/information`;
+
+          // Create a reference to the Firebase Realtime Database
+          const database = getDatabase();
+
+          // Define the data to be saved
+          const childInfo = {
+            firstname,
+            dob,
+            grade,
+            country,
+            gender,
+          };
+
+          // Save the child's information under the specified path
+          await set(ref(database, childInfoPath), childInfo);
+
+          // Registration successful, you can redirect the user
+          navigate("/home");
         }
-    }
-  };
-
-  const isAgeValid = (dateOfBirth) => {
-    const currentDate = new Date();
-    const birthDate = new Date(dateOfBirth);
-    const age = currentDate.getFullYear() - birthDate.getFullYear();
-    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
-
-    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
-      return age - 1 >= 6;
-    }
-
-    return age >= 6;
-  };
-
-  /*
-  const isEmailAlreadyRegistered = async (emailToCheck) => {
-    const userRef = collection(database, "users");
-    const q = query(userRef, where("email", "==", userIDToCheck));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.size > 0;
-  };
- */
-  const isUserAlreadyRegistered = async (emailToCheck) => {
-    const database = getDatabase();
-    const usersRef = ref(database, "child");
-
-    // Query the database to check if the email exists
-    const snapshot = await get(usersRef);
-
-    if (snapshot.exists()) {
-      const userData = snapshot.val();
-      for (const userId in userData) {
-        if (userData[userId].email === emailToCheck) {
-          return true; // Email already registered
-        }
+      } catch (error) {
+        console.error("Error registering child:", error);
+        setError("Registration failed. Please try again later.");
       }
-    }
-    return false; // Email not registered
-  };
-
-
-  const registerUser = async (currentUserUid) => {
-    const auth = getAuth();
-    try {
-      // Create a new user in Firebase Authentication
-      console.log("email value is :", email);
-      const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      //const userRef = collection(database, "users");
-      if(user)
-      {
-        const database = getDatabase();
-        const usersRef = ref(database, "child/" + user.uid);
-        const newUser = {
-          role: "student",
-          uid: user.uid,
-          firstname,
-          lastname,
-          email,
-          dob,
-          grade,
-          country,
-          region,
-          gender,
-          password,
-          parentUid: currentUserUid, // Store the parent's UID
-        };
-        await set(usersRef, newUser);
-        setIsRegistered(true);
-      }
-    } catch (error) {
-      console.error("Error registering user:", error);
-      setError("Registration failed. Please try again later.");
     }
   };
 
