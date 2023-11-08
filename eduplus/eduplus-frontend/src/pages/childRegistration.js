@@ -1,16 +1,18 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assests/styles/registrationpagestyles.css"
 import countriesList from '../dummydata/countries';
-//import {database} from '../firebase'
+import {database} from '../firebase'
+import { getDatabase, ref, set, get } from "firebase/database";
 import { useAuth } from "../pages/authcontext";
 //import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
-import { getDatabase, ref, set, get } from "firebase/database";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { fetchUserProfileData } from "./firebaseFunctions"; // Import the function to fetch user data
 
 const ChildRegistrationPage = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const [userData, setUserData] = useState(null);
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
@@ -31,20 +33,32 @@ const ChildRegistrationPage = () => {
     setCountries(countriesList);
   }, []);
 
+  useEffect(() => {
+    if (currentUser) {
+      const uid = currentUser.uid;
+      fetchUserProfileData(uid)
+        .then((data) => {
+          setUserData(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user profile data:", error);
+        });
+    }
+  }, [currentUser]);
 
   const handleRegistration = async (e) => {
     e.preventDefault();
 
     if (
       !firstname ||
-      !lastname ||
+      // !lastname ||
       !password ||
       !confirmPassword ||
-      //!email ||
+      // !email ||
       !dob ||
       !grade ||
       !country ||
-      !region ||
+      // !region ||
       !gender
     ) {
       setError("Kinldy fill all the mandatory fields!");
@@ -61,9 +75,9 @@ const ChildRegistrationPage = () => {
         // Set the email field with the constructed email
         setEmail(constructedEmail);
         // Continue with registration
-        registerUser();
+        registerUser(currentUser.uid);
         setError("Email address is already registered.");
-      }
+        }
     }
   };
 
@@ -87,8 +101,7 @@ const ChildRegistrationPage = () => {
     const querySnapshot = await getDocs(q);
     return querySnapshot.size > 0;
   };
-  */
-
+ */
   const isUserAlreadyRegistered = async (emailToCheck) => {
     const database = getDatabase();
     const usersRef = ref(database, "child");
@@ -104,16 +117,17 @@ const ChildRegistrationPage = () => {
         }
       }
     }
-
     return false; // Email not registered
   };
 
 
-  const registerUser = async () => {
+  const registerUser = async (currentUserUid) => {
     const auth = getAuth();
     try {
       // Create a new user in Firebase Authentication
+      console.log("email value is :", email);
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      //const userRef = collection(database, "users");
       if(user)
       {
         const database = getDatabase();
@@ -129,7 +143,8 @@ const ChildRegistrationPage = () => {
           country,
           region,
           gender,
-          password
+          password,
+          parentUid: currentUserUid, // Store the parent's UID
         };
         await set(usersRef, newUser);
         setIsRegistered(true);
@@ -239,21 +254,21 @@ const ChildRegistrationPage = () => {
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
               >
-                <option value="">Select Country</option>
-                {countriesList.map((countryOption) => (
-                  <option key={countryOption} value={countryOption}>
-                    {countryOption}
-                  </option>
-                ))}
-              </select>
+              <option value="">Select Country</option>
+              {countriesList.map((countryOption) => (
+                <option key={countryOption} value={countryOption}>
+                  {countryOption}
+                </option>
+              ))}
+            </select>
             </div>
             <div className="form-group">
-              <label htmlFor="region">State/Province</label>
+              <label htmlFor="region">Region</label>
               <input
                 type="text"
                 id="region"
                 name="region"
-                placeholder="State/Province"
+                placeholder="Region"
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
               />
@@ -263,7 +278,7 @@ const ChildRegistrationPage = () => {
               <select
                 id="gender"
                 name="gender"
-                value={gender}
+                value={gender}                
                 onChange={(e) => setGender(e.target.value)}
               >
                 <option value="">Select Gender</option>
@@ -272,7 +287,7 @@ const ChildRegistrationPage = () => {
                 <option value="other">Other</option>
               </select>
             </div>
-            <button type="submit">REGISTER</button>
+            <button type="submit">REGISTER</button>             
           </form>
           {error && <p className="error">{error}</p>}
         </div>

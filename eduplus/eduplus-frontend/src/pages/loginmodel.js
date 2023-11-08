@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../assests/styles/loginmodelstyles.css";
 import ForgotPasswordModal from "./forgotpassword";
-import { getDatabase, ref, get, child } from "firebase/database";
+import { getDatabase, ref, get } from "firebase/database";
 import close from "../assests/images/close.png";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
