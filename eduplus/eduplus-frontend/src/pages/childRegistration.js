@@ -71,6 +71,11 @@ const ChildRegistrationPage = () => {
       // !lastname ||
       !password ||
       !confirmPassword ||
+<<<<<<< HEAD
+=======
+      !trimmedUserID || // Use the trimmed username for validation
+      !userID ||
+>>>>>>> db06c098879a1cff8d72f3df4f7996397437701a
       !dob ||
       !grade ||
       !country ||
@@ -80,11 +85,35 @@ const ChildRegistrationPage = () => {
       setError("Kinldy fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
+<<<<<<< HEAD
     } else {
       try {
         // Create a new user with email and password
         const { email } = user; // Get the parent's email
         const credential = await createUserWithEmailAndPassword(auth, email, password);
+=======
+    } else if (trimmedUserID.length > 8) {
+      setError("Username must be at most 8 characters long");
+    } else if (!isAgeValid(dob)) {
+      setError("You must be at least 6 years old to register.");
+    } else {
+      // Construct the email address using firstname
+      const constructedEmail = `${trimmedUserID}@eduplus.com`;
+      setEmail(constructedEmail);
+      if (await isUserAlreadyRegistered(constructedEmail)) {
+        setError("This UserId is already taken, please choose another.");
+      } else {
+        // Set the email field with the constructed email
+        
+      console.log("Email Value Before Registration:", email); // Debugging line
+        // Set the email field with the constructed email
+       
+        // Continue with registration
+      registerUser(currentUser.uid);
+        }
+    }
+  };
+>>>>>>> db06c098879a1cff8d72f3df4f7996397437701a
 
         if (credential) {
           const { uid } = credential.user;
@@ -95,6 +124,7 @@ const ChildRegistrationPage = () => {
           // Create a reference to the Firebase Realtime Database
           const database = getDatabase();
 
+<<<<<<< HEAD
           // Define the data to be saved
           const childInfo = {
             firstname,
@@ -113,6 +143,67 @@ const ChildRegistrationPage = () => {
       } catch (error) {
         console.error("Error registering child:", error);
         setError("Registration failed. Please try again later.");
+=======
+  /*
+  const isEmailAlreadyRegistered = async (emailToCheck) => {
+    const userRef = collection(database, "users");
+    const q = query(userRef, where("email", "==", userIDToCheck));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.size > 0;
+  };
+ */
+  const isUserAlreadyRegistered = async (emailToCheck) => {
+    const database = getDatabase();
+    const usersRef = ref(database, "child");
+
+    // Query the database to check if the email exists
+    const snapshot = await get(usersRef);
+
+    if (snapshot.exists()) {
+      const userData = snapshot.val();
+      for (const userId in userData) {
+        if (userData[userId].email === emailToCheck) {
+          return true; // Email already registered
+        }
+      }
+    }
+    return false; // Email not registered
+  };
+
+
+  const registerUser = async (currentUserUid) => {
+    const auth = getAuth();
+    try {
+       // Ensure the email is set properly
+    if (!email) {
+      setError("Email is missing. Please try again.");
+      return;
+    }
+      // Create a new user in Firebase Authentication
+      console.log("email value is :", email);
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      //const userRef = collection(database, "users");
+      if(user)
+      {
+        const database = getDatabase();
+        const usersRef = ref(database, "child/" + user.uid);
+        const newUser = {
+          role: "student",
+          uid: user.uid,
+          firstname,
+          lastname,
+          email,
+          dob,
+          grade,
+          country,
+          region,
+          gender,
+          password,
+          parentUid: currentUserUid, // Store the parent's UID
+        };
+        await set(usersRef, newUser);
+        setIsRegistered(true);
+>>>>>>> db06c098879a1cff8d72f3df4f7996397437701a
       }
     }
   };
