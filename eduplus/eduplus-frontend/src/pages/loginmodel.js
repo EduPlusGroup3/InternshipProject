@@ -38,7 +38,7 @@ const LoginModal = ({ isOpen, onClose, onLogin , openForgotModal }) => {
       setUsername("");
       setPassword("");
       setSelectedRole("user"); // Reset the role to the default after login
-      navigate("/userhp");
+      navigate("/home");
     } else {
       setError("Invalid username or password");
     }
@@ -82,7 +82,7 @@ const LoginModal = ({ isOpen, onClose, onLogin , openForgotModal }) => {
             >
               <option value="admin">Admin</option>
               <option value="parent">Parent</option>
-              {/* <option value="instructor">Instructor</option> */}
+              <option value="instructor">Instructor</option>
               <option value="student">Student</option>
             </select>
           </div>

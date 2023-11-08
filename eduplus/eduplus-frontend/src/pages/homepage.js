@@ -2,7 +2,7 @@
     import React,{useState, useEffect} from "react";
     import LoginModal from "./loginmodel";
     import ForgotPasswordModal  from "./forgotpassword";
-    import { useNavigate } from "react-router-dom";
+    import { useNavigate, Link } from "react-router-dom";
     import "../assests/styles/homepagestyles.css";
     import genioLogo from "../assests/images/genioLogo1.png";
     import sliderRobot from "../assests/images/sliderRobot.png";
@@ -54,7 +54,8 @@
             <div className="button-container">          
             {isLoggedIn ? (
                 <>
-                  <span className="login-button">{username}</span>
+                  <Link to="/userhp" className="login-button">{username}</Link>
+
                   <button className="login-button" onClick={logout}>
                     Logout
                   </button>

@@ -12,7 +12,7 @@ import { AuthProvider } from "./pages/authcontext";
 const App = () => {
   return (
     <Router>  
-      <AuthProvider>  
+      <AuthProvider>         
         <Routes>
           <Route exact path="/" element={<HomePage/>}/>
           <Route exact path="/home" element={<HomePage/>}/>
@@ -20,7 +20,7 @@ const App = () => {
           <Route exact path="/childregister" element={<ChildRegistrationPage/>}/>
           <Route exact path="/aboutus" element={<AboutUSPage/>}/>
           <Route exact path="/userhp" element={<UserHomePage/>}/>
-          </Routes>  
+          </Routes>           
         </AuthProvider>      
     </Router>
   );
