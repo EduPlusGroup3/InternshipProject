@@ -2,17 +2,23 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assests/styles/registrationpagestyles.css";
 import countriesList from '../dummydata/countries';
-import { database } from '../firebase';
+import {database} from '../firebase'
+import { getDatabase, ref, set, get } from "firebase/database";
 import { useAuth } from "../pages/authcontext";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+//import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { fetchUserProfileData } from "./firebaseFunctions"; // Import the function to fetch user data
 
 const ChildRegistrationPage = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const [userData, setUserData] = useState(null);
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userID, setUserId] = useState("");
+  const [email, setEmail] = useState("");
   const [dob, setDOB] = useState("");
   const [grade, setGrade] = useState("");
   const [country, setCountry] = useState("");
@@ -28,13 +34,30 @@ const ChildRegistrationPage = () => {
     setCountries(countriesList);
   }, []);
 
+  useEffect(() => {
+    if (currentUser) {
+      const uid = currentUser.uid;
+      fetchUserProfileData(uid)
+        .then((data) => {
+          setUserData(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user profile data:", error);
+        });
+    }
+  }, [currentUser]);
+
   const handleRegistration = async (e) => {
     e.preventDefault();
+     // Trim leading and trailing spaces from the username
+  const trimmedUsername = userID.trim();
+
 
     if (
       !firstname ||
       // !lastname ||
       !password ||
+      !trimmedUsername ||
       !confirmPassword ||
       !userID ||
       !dob ||
@@ -46,15 +69,21 @@ const ChildRegistrationPage = () => {
       setError("Kinldy fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
-    } else if (userID.length > 8) {
+    } else if (trimmedUsername.length > 8) {
       setError("Username must be at most 8 characters long");
     } else if (!isAgeValid(dob)) {
       setError("You must be at least 6 years old to register.");
-    } else if (await isUserIdAlreadyRegistered(userID)) {
-      setError("User ID is already registered.");
     } else {
-      //setIsRegistered(true);
-      registerUser();  // Register the user in Firestore
+      // Construct the email address using firstname
+      const constructedEmail = `${trimmedUsername}@eduplus.com`;
+      if (await isUserAlreadyRegistered(constructedEmail)) {
+        setError("This UserId is already taken, please choose another.");
+      } else {
+        // Set the email field with the constructed email
+        setEmail(constructedEmail);
+        // Continue with registration
+        registerUser(currentUser.uid);
+        }
     }
   };
 
@@ -71,30 +100,75 @@ const ChildRegistrationPage = () => {
     return age >= 6;
   };
 
-  const isUserIdAlreadyRegistered = async (userIDToCheck) => {
+  /*
+  const isEmailAlreadyRegistered = async (emailToCheck) => {
     const userRef = collection(database, "users");
     const q = query(userRef, where("email", "==", userIDToCheck));
     const querySnapshot = await getDocs(q);
     return querySnapshot.size > 0;
   };
+ */
+  const isUserAlreadyRegistered = async (emailToCheck) => {
+    const database = getDatabase();
+    const usersRef = ref(database, "child");
 
-  const registerUser = async () => {
+    // Query the database to check if the email exists
+    const snapshot = await get(usersRef);
+
+    if (snapshot.exists()) {
+      const userData = snapshot.val();
+      for (const userId in userData) {
+        if (userData[userId].email === emailToCheck) {
+          return true; // Email already registered
+        }
+      }
+    }
+    return false; // Email not registered
+  };
+
+
+  const registerUser = async (currentUserUid) => {
+    const auth = getAuth();
     try {
-      const userRef = collection(database, "users");
-      const newUser = {
-        firstname,
-        // lastname,
-        userID,
-        dob,
-        grade,
-        country,
-        // region,
-        gender,
-        password
-      };
-      const docRef = await addDoc(userRef, newUser);
+      // Create a new user in Firebase Authentication
+      console.log("email value is :", email);
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      //const userRef = collection(database, "users");
+      if(user)
+      {
+        const database = getDatabase();
+         // Fetch the current count of children registered under the parent's node
+      const parentRef = ref(database, `users/${currentUserUid}/child`);
+      const parentSnapshot = await get(parentRef);
+      const childCount = parentSnapshot.exists() ? Object.keys(parentSnapshot.val()).length : 0;
 
-      if (docRef.id) {
+       // Create a unique key for the new child (e.g., "child1", "child2")
+       const childKey = `child${childCount + 1}`;
+
+           // Set the child's name (using the first name) as the key under the parent's node
+    const childName = firstname;
+ 
+   ;
+        const usersRef = ref(database, "child/" + user.uid);
+        const newUser = {
+          role: "student",
+          uid: user.uid,
+          firstname,
+          lastname,
+          email,
+          dob,
+          grade,
+          country,
+          region,
+          gender,
+          password,
+          parentUid: currentUserUid, // Store the parent's UID
+        };
+        await set(usersRef, newUser);
+        // Update the parent's data with the child's UID under the child's name (first name)
+        const parentChildRef = ref(database, `users/${currentUserUid}/child/${childName}`);
+        await set(parentChildRef, user.uid);
+
         setIsRegistered(true);
       }
     } catch (error) {
@@ -212,12 +286,12 @@ const ChildRegistrationPage = () => {
               </select>
             </div>
             <div className="form-group">
-              <label htmlFor="region">State/Province</label>
+              <label htmlFor="region">Region</label>
               <input
                 type="text"
                 id="region"
                 name="region"
-                placeholder="State/Province"
+                placeholder="Region"
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
               />
