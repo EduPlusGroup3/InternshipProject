@@ -49,11 +49,15 @@ const ChildRegistrationPage = () => {
 
   const handleRegistration = async (e) => {
     e.preventDefault();
+     // Trim leading and trailing spaces from the username
+  const trimmedUsername = userID.trim();
+
 
     if (
       !firstname ||
       // !lastname ||
       !password ||
+      !trimmedUsername ||
       !confirmPassword ||
       !userID ||
       !dob ||
@@ -65,13 +69,13 @@ const ChildRegistrationPage = () => {
       setError("Kinldy fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
-    } else if (userID.length > 8) {
+    } else if (trimmedUsername.length > 8) {
       setError("Username must be at most 8 characters long");
     } else if (!isAgeValid(dob)) {
       setError("You must be at least 6 years old to register.");
     } else {
       // Construct the email address using firstname
-      const constructedEmail = `${userID}@eduplus.com`;
+      const constructedEmail = `${trimmedUsername}@eduplus.com`;
       if (await isUserAlreadyRegistered(constructedEmail)) {
         setError("This UserId is already taken, please choose another.");
       } else {
@@ -133,6 +137,18 @@ const ChildRegistrationPage = () => {
       if(user)
       {
         const database = getDatabase();
+         // Fetch the current count of children registered under the parent's node
+      const parentRef = ref(database, `users/${currentUserUid}/child`);
+      const parentSnapshot = await get(parentRef);
+      const childCount = parentSnapshot.exists() ? Object.keys(parentSnapshot.val()).length : 0;
+
+       // Create a unique key for the new child (e.g., "child1", "child2")
+       const childKey = `child${childCount + 1}`;
+
+           // Set the child's name (using the first name) as the key under the parent's node
+    const childName = firstname;
+ 
+   ;
         const usersRef = ref(database, "child/" + user.uid);
         const newUser = {
           role: "student",
@@ -149,6 +165,10 @@ const ChildRegistrationPage = () => {
           parentUid: currentUserUid, // Store the parent's UID
         };
         await set(usersRef, newUser);
+        // Update the parent's data with the child's UID under the child's name (first name)
+        const parentChildRef = ref(database, `users/${currentUserUid}/child/${childName}`);
+        await set(parentChildRef, user.uid);
+
         setIsRegistered(true);
       }
     } catch (error) {

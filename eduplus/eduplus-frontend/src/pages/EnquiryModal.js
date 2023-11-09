@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import countriesList from '../dummydata/countries';
 import { getDatabase, ref, get } from "firebase/database";
+import emailjs from "emailjs-com"; // Import EmailJS library
 
 const EnquiryModal = ({ onClose, uid }) => {
   const [email, setEmail] = useState("");
@@ -74,8 +75,28 @@ const EnquiryModal = ({ onClose, uid }) => {
 
   const handleSend = () => {
     if (validateForm()) {
-      console.log("Enquiry sent:", { email, contactNo, country, subject, message });
+      // Define your EmailJS parameters
+      const serviceID = "service_3zeudls";
+      const templateID = "template_sjgnnwa";
+      const userID = "00gryQEO6fb36Zu7D";
 
+      // Use the EmailJS send function to send the email
+      emailjs.send(serviceID, templateID, {
+        email,
+        contactNo,
+        country,
+        region,
+        subject,
+        message
+      }, userID)
+        .then(function (response) {
+          console.log("Email sent successfully", response);
+        })
+        .catch(function (error) {
+          console.error("Error sending email:", error);
+        });
+
+      // Reset the form fields
       setEmail("");
       setContactNo("");
       setCountry("");
