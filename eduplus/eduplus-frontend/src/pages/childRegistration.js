@@ -80,9 +80,9 @@ const ChildRegistrationPage = () => {
         setError("This UserId is already taken, please choose another.");
       } else {
         // Set the email field with the constructed email
-        setEmail(constructedEmail);
+        //setEmail(constructedEmail);
         // Continue with registration
-        registerUser(currentUser.uid);
+        registerUser(currentUser.uid, constructedEmail);
       }
     }
   };
@@ -127,11 +127,13 @@ const ChildRegistrationPage = () => {
   };
 
 
-  const registerUser = async (currentUserUid) => {
+  const registerUser = async (currentUserUid, email) => {
     const auth = getAuth();
     try {
       // Create a new user in Firebase Authentication
-      console.log("email value is :", email);
+      //setEmail(email);
+      console.log("OLD email value is :", email);
+      //console.log("NEW email value is :", emailId);
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       //const userRef = collection(database, "users");
       if (user) {
@@ -182,7 +184,7 @@ const ChildRegistrationPage = () => {
         <div className="registration-success">
           <h2>Registration Successful!</h2>
           <p>
-            Your registration is complete. Your First Name will be your UserName. You can now proceed to the Home page.
+            Your registration is complete. Please login with your UserName. You can now proceed to the Home page.
           </p>
           <button onClick={() => navigate("/home")}>Proceed to Home</button>
         </div>
