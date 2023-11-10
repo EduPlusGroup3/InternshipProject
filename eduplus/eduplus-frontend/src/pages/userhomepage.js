@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
 import { useNavigate } from "react-router-dom";
-import RescheduleClasses from "./rescheduleclasses";
-import Enquiry from "./enquiry";
+import MyClasses from "./myclasses";
+import EnquiryModal from "./EnquiryModal"; // Import the EnquiryModal component
 import ClassesPreferred from "./classespreferred";
 import ForgotPasswordModal from "./forgotpassword";
 import "../assests/styles/userhomepagestyles.css";
@@ -11,25 +11,31 @@ import genioLogo from "../assests/images/genioLogo1.png";
 import genioLogoFooter from "../assests/images/genioLogoFooter.png";
 import VerticalMenu from "./verticalmenu";
 import { useAuth } from "../pages/authcontext";
+import dummyClassesData from "../dummydata/classesAttended";
+import { getDatabase, ref, get } from "firebase/database";
+import { getAuth } from "firebase/auth";
 
 const UserHomePage = () => {
   const navigate = useNavigate();
   const { isLoggedIn, username, login, logout, currentUser } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);  
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [openModal, setOpenModal] = useState(null);
   const [activeLink, setActiveLink] = useState("home");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isClassesPreferOpen, setIsClassesPreferOpen] = useState(false);
-  const [isClasRescheduleOpen, setIsClassesRescheduleOpen] = useState(false);
+  const [ismyClassesOpen, setIsMyClassesOpen] = useState(false);
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+  const [profileData, setProfileData] = useState(null);
+
+  const [uid, setUid] = useState(null);
 
   useEffect(() => {
     setActiveLink("home");
     setIsProfileOpen(true);
     setIsClassesPreferOpen(false);
     setIsEnquiryOpen(false);
-    setIsClassesRescheduleOpen(false);
+    setIsMyClassesOpen(false);
   }, []);
 
   const openLoginModal = () => {
@@ -49,33 +55,64 @@ const UserHomePage = () => {
     setIsForgotModalOpen(false);
   };
 
+  const fetchUserProfileData = async (uid) => {
+    if (!uid) {
+      console.error("UID is not defined.");
+      return;
+    }
+
+    const database = getDatabase();
+    const userRef = ref(database, `users/${uid}`);
+
+    try {
+      const userSnapshot = await get(userRef);
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.val();
+        setProfileData(userData);
+      } else {
+        setProfileData(null);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setProfileData(null);
+    }
+  };
+
+  useEffect(() => {
+    if (isProfileOpen && currentUser) {
+      const uid = currentUser.uid;
+      fetchUserProfileData(uid);
+      setUid(uid);
+    }
+  }, [isProfileOpen, currentUser]);
+
   const handleNavLinkClick = (link) => {
     if (link === "profile") {
       setIsProfileOpen(true);
+      setOpenModal(null);
       setIsClassesPreferOpen(false);
       setIsEnquiryOpen(false);
-      setIsClassesRescheduleOpen(false);
+      setIsMyClassesOpen(false);
     } else if (link === "classesPreferred") {
       setIsClassesPreferOpen(true);
       setIsProfileOpen(false);
       setIsEnquiryOpen(false);
-      setIsClassesRescheduleOpen(false);
-    } else if (link === "rescheduleClasses") {
+      setIsMyClassesOpen(false);
+    } else if (link === "myclasses") {
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
       setIsEnquiryOpen(false);
-      setIsClassesRescheduleOpen(true);
+      setIsMyClassesOpen(true);
     } else if (link === "enquiry") {
+      console.log("Enquiry link clicked");
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
       setIsEnquiryOpen(true);
-      setIsClassesRescheduleOpen(false);
-    }else if(link === "contactus"){
-      setIsEnquiryOpen(true);
-    } 
-    else {
+      setIsMyClassesOpen(false);
+    } else {
       setActiveLink(link);
       setOpenModal(link);
+      setIsProfileOpen(false);
     }
   };
 
@@ -91,44 +128,49 @@ const UserHomePage = () => {
     setIsEnquiryOpen(false);
   };
 
-  const closeRescheduleClassesModal = () => {
-    setIsClassesRescheduleOpen(false);
+  const closeMyClassesModal = () => {
+    setIsMyClassesOpen(false);
   };
 
   const menuItems = [
     { id: "profile", label: "Profile" },
     { id: "classesPreferred", label: "Classes Preferred" },
-    { id: "rescheduleClasses", label: "Reschedule Classes" },
+    { id: "myclasses", label: "My Classes" },
     { id: "enquiry", label: "Enquiry" },
   ];
 
   const isParent = currentUser && currentUser.role === 'parent';
 
+  const handleLogin = (userData) => {
+    login(userData);
+    setUid(userData.uid);
+  };
+
   return (
     <div className="user-home-page">
-      <header className="header">     
-        <div className="left-section">          
-              <span role="img" aria-label="telephone">📞</span> TEL:(+2)03 5832593         
-          </div>
-          <div className="button-container">          
+      <header className="header">
+        <div className="left-section">
+          <span role="img" aria-label="telephone">📞</span> TEL:(+2)03 5832593
+        </div>
+        <div className="button-container">
           {isLoggedIn ? (
-              <>
-                <span className="login-button">{username}</span>
-                <button className="login-button" onClick={logout}>
-                  Logout
-                </button>
-              </>
-            ) : (
-              <button className="login-button" onClick={openLoginModal}>
-                Login
+            <>
+              <span className="login-button">{username}</span>
+              <button className="login-button" onClick={logout}>
+                Logout
               </button>
-            )}
-            {isParent && ( <span className="pipe">|</span>)}
-            {isParent && (
-                          <button className="employee-login-button" onClick={() => navigate("/childregister")}>Child Registration</button>
-                      )}
-          </div>
-        </header>
+            </>
+          ) : (
+            <button className="login-button" onClick={openLoginModal}>
+              Login
+            </button>
+          )}
+          {isParent && <span className="pipe">|</span>}
+          {isParent && (
+            <button className="employee-login-button" onClick={() => navigate("/childregister")}>Child Registration</button>
+          )}
+        </div>
+      </header>
       <span>
         <nav className="userhpnavigation">
           <a
@@ -139,7 +181,7 @@ const UserHomePage = () => {
             <img src={genioLogo} alt="Genio" style={{ height: "auto", width: "auto" }} />
           </a>
           <a
-            href="/userhp"
+            href="/home"
             className={`hpnav-link ${activeLink === "home" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("home")}
           >
@@ -162,13 +204,20 @@ const UserHomePage = () => {
             activeItem={openModal}
             onItemClick={(item) => handleNavLinkClick(item)}
           />
-          {isProfileOpen && <UserProfile onClose={closeProfileModal} username={username} />}
+          {isProfileOpen && <UserProfile
+            isProfileOpen={isProfileOpen}
+            onClose={closeProfileModal}
+            username={username}
+            profileData={profileData}
+          />}
           {isClassesPreferOpen && (
             <ClassesPreferred onClose={closeClassesPreferModal} username={username} />
           )}
-          {isEnquiryOpen && <Enquiry onClose={closeEnquiryModal} username={username} />}
-          {isClasRescheduleOpen && (
-            <RescheduleClasses onClose={closeRescheduleClassesModal} username={username} />
+          {isEnquiryOpen && (
+            <EnquiryModal onClose={closeEnquiryModal} username={username} uid={uid} />
+          )}
+          {ismyClassesOpen && (
+            <MyClasses onClose={closeMyClassesModal} username={username} classesData={dummyClassesData} />
           )}
         </section>
       </main>
@@ -182,7 +231,7 @@ const UserHomePage = () => {
               style={{ height: "auto", width: "auto" }}
             />
           </a>
-          <a href="/userhp" className="footer-nav-link">
+          <a href="/home" className="footer-nav-link">
             Home
           </a>
           <a href="/aboutus" className="footer-nav-link">
@@ -195,7 +244,7 @@ const UserHomePage = () => {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={closeLoginModal}
-        onLogin={login}
+        onLogin={handleLogin}
         openForgotModal={openForgotModal}
       />
       <ForgotPasswordModal isOpen={isForgotModalOpen} onClose={closeForgotModal} />

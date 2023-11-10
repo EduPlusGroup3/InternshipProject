@@ -87,6 +87,8 @@ const EnquiryModal = ({ onClose }) => {
       
       console.log("Enquiry sent:", { email, contactNo, country, subject, message });
 
+      alert("Enquiry successfully sent to the admin");
+
       // Clear form fields
       setEmail("");
       setContactNo("");
@@ -186,7 +188,7 @@ const EnquiryModal = ({ onClose }) => {
             required
             rows="2" 
             cols="50"
-            placeholder=" upto 10000 words max"
+            placeholder=" upto 1000 words max"
           />
            {errors.message && <p className="error">{errors.message}</p>}          
         </div>
