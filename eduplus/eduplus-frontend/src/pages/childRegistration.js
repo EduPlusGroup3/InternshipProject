@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../assests/styles/registrationpagestyles.css";
 import countriesList from '../dummydata/countries';
-import {database} from '../firebase'
+import { database } from '../firebase'
 import { getDatabase, ref, set, get } from "firebase/database";
 import { useAuth } from "../pages/authcontext";
 //import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
@@ -49,8 +49,8 @@ const ChildRegistrationPage = () => {
 
   const handleRegistration = async (e) => {
     e.preventDefault();
-     // Trim leading and trailing spaces from the username
-  const trimmedUsername = userID.trim();
+    // Trim leading and trailing spaces from the username
+    const trimmedUsername = userID.trim();
 
 
     if (
@@ -80,10 +80,10 @@ const ChildRegistrationPage = () => {
         setError("This UserId is already taken, please choose another.");
       } else {
         // Set the email field with the constructed email
-        setEmail(constructedEmail);
+        //setEmail(constructedEmail);
         // Continue with registration
-        registerUser(currentUser.uid);
-        }
+        registerUser(currentUser.uid, constructedEmail);
+      }
     }
   };
 
@@ -110,7 +110,7 @@ const ChildRegistrationPage = () => {
  */
   const isUserAlreadyRegistered = async (emailToCheck) => {
     const database = getDatabase();
-    const usersRef = ref(database, "child");
+    const usersRef = ref(database, "users");
 
     // Query the database to check if the email exists
     const snapshot = await get(usersRef);
@@ -127,29 +127,30 @@ const ChildRegistrationPage = () => {
   };
 
 
-  const registerUser = async (currentUserUid) => {
+  const registerUser = async (currentUserUid, email) => {
     const auth = getAuth();
     try {
       // Create a new user in Firebase Authentication
-      console.log("email value is :", email);
+      //setEmail(email);
+      console.log("OLD email value is :", email);
+      //console.log("NEW email value is :", emailId);
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       //const userRef = collection(database, "users");
-      if(user)
-      {
+      if (user) {
         const database = getDatabase();
-         // Fetch the current count of children registered under the parent's node
-      const parentRef = ref(database, `users/${currentUserUid}/child`);
-      const parentSnapshot = await get(parentRef);
-      const childCount = parentSnapshot.exists() ? Object.keys(parentSnapshot.val()).length : 0;
+        // Fetch the current count of children registered under the parent's node
+        const parentRef = ref(database, `users/${currentUserUid}/child`);
+        const parentSnapshot = await get(parentRef);
+        const childCount = parentSnapshot.exists() ? Object.keys(parentSnapshot.val()).length : 0;
 
-       // Create a unique key for the new child (e.g., "child1", "child2")
-       const childKey = `child${childCount + 1}`;
+        // Create a unique key for the new child (e.g., "child1", "child2")
+        //const childKey = `child${childCount + 1}`;
 
-           // Set the child's name (using the first name) as the key under the parent's node
-    const childName = firstname;
- 
-   ;
-        const usersRef = ref(database, "child/" + user.uid);
+        // Set the child's name (using the first name) as the key under the parent's node
+        const childName = firstname;
+
+        ;
+        const usersRef = ref(database, "users/" + user.uid);
         const newUser = {
           role: "student",
           uid: user.uid,
@@ -183,7 +184,7 @@ const ChildRegistrationPage = () => {
         <div className="registration-success">
           <h2>Registration Successful!</h2>
           <p>
-            Your registration is complete. Your First Name will be your UserName. You can now proceed to the Home page.
+            Your registration is complete. Please login with your UserName. You can now proceed to the Home page.
           </p>
           <button onClick={() => navigate("/home")}>Proceed to Home</button>
         </div>
@@ -243,8 +244,8 @@ const ChildRegistrationPage = () => {
                 name="username"
                 placeholder="Username"
                 value={userID}
-                maxLength="8"  
-                onChange={(e) => setUserId(e.target.value)}             
+                maxLength="8"
+                onChange={(e) => setUserId(e.target.value)}
               />
             </div>
             <div className="form-group">
