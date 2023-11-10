@@ -12,7 +12,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState("user");
+  const [selectedRole, setSelectedRole] = useState("admin");
   const [error, setError] = useState("");
 
   if (!isOpen) return null;
@@ -44,8 +44,8 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
         onClose(); // Close the modal
         setUsername("");
         setPassword("");
-        setSelectedRole("user"); // Reset the role to the default after login
-        navigate("/userhp");
+        setSelectedRole("admin"); // Reset the role to the default after login
+        navigate("/home");
       } else {
         setError("Invalid user role");
       }
