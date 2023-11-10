@@ -10,7 +10,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
   const navigate = useNavigate();
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
-  const [username, setUsername] = useState("");
+  let [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [selectedRole, setSelectedRole] = useState("user");
   const [error, setError] = useState("");
@@ -31,6 +31,13 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
     const auth = getAuth();
   
     try {
+      console.log("first username --> ", username);
+      if(selectedRole === "student")
+      {
+        console.log("first selectedRole --> ", selectedRole);
+        username = `${username}@eduplus.com`;
+      }
+      console.log("username --> ", username);
       const userCredential = await signInWithEmailAndPassword(auth, username, password);
       const user = userCredential.user;
   
@@ -50,6 +57,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
         setError("Invalid user role");
       }
     } catch (error) {
+      console.log("Error-->", error);
       setError("Invalid username or password");
     }
   };
