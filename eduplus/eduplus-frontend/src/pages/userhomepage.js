@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import MyClasses from "./myclasses";
-import EnquiryModal from "./EnquiryModal"; // Import the EnquiryModal component
+import EnquiryModal from "./enquiry"; 
 import ClassesPreferred from "./classespreferred";
 import ForgotPasswordModal from "./forgotpassword";
 import "../assests/styles/userhomepagestyles.css";
@@ -13,7 +13,6 @@ import VerticalMenu from "./verticalmenu";
 import { useAuth } from "../pages/authcontext";
 import dummyClassesData from "../dummydata/classesAttended";
 import { getDatabase, ref, get } from "firebase/database";
-import { getAuth } from "firebase/auth";
 
 const UserHomePage = () => {
   const navigate = useNavigate();
@@ -140,6 +139,7 @@ const UserHomePage = () => {
   ];
 
   const isParent = currentUser && currentUser.role === 'parent';
+  const isAdmin = currentUser && currentUser.role === 'admin';
 
   const handleLogin = (userData) => {
     login(userData);
@@ -152,10 +152,14 @@ const UserHomePage = () => {
         <div className="left-section">
           <span role="img" aria-label="telephone">📞</span> TEL:(+2)03 5832593
         </div>
-        <div className="button-container">
-          {isLoggedIn ? (
+        <div className="button-container">          
+        {isLoggedIn ? (
             <>
-              <span className="login-button">{username}</span>
+          {isAdmin ? (
+                <Link to="/adminhp" className="login-button">{username}</Link>
+              ) : (
+                <Link to="/userhp" className="login-button">{username}</Link>
+              )}
               <button className="login-button" onClick={logout}>
                 Logout
               </button>
@@ -165,16 +169,21 @@ const UserHomePage = () => {
               Login
             </button>
           )}
-          {isParent && <span className="pipe">|</span>}
+          {isAdmin && ( <span className="pipe">|</span>)}
+          {isAdmin && (
+                        <button className="employee-login-button" onClick={() => navigate("/instructorregister")}>Instructor Registration</button>
+                    )}
+          {isParent && ( <span className="pipe">|</span>)}
           {isParent && (
-            <button className="employee-login-button" onClick={() => navigate("/childregister")}>Child Registration</button>
-          )}
+                        <button className="employee-login-button" onClick={() => navigate("/childregister")}>Child Registration</button>
+                    )}              
         </div>
       </header>
       <span>
+      
         <nav className="userhpnavigation">
           <a
-            href="/home"
+            href="/home" 
             className={`hpnav-link ${activeLink === "geniotech" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("geniotech")}
           >

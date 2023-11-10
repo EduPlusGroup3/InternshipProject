@@ -3,7 +3,7 @@ import React,{useState, useEffect} from "react";
 import LoginModal from "./loginmodel";
 import ForgotPasswordModal  from "./forgotpassword";
 import "../assests/styles/aboutusstyles.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import genioLogo from "../assests/images/genioLogo1.png";
 import finalhome from "../assests/images/finalhome.png";
 import genioLogoFooter from "../assests/images/genioLogoFooter.png";
@@ -19,7 +19,7 @@ const AboutUSPage = () => {
         const [activeLink, setActiveLink] = useState('home');
 
         useEffect(() => {
-          console.log("isLoggedIn:", isLoggedIn);
+        console.log("isLoggedIn:", isLoggedIn);
         console.log("username:", username);
         console.log("currentUser:", currentUser);
           setActiveLink('home');
@@ -47,7 +47,8 @@ const AboutUSPage = () => {
           };
 
           const isParent = currentUser && currentUser.role === 'parent';
-
+        
+          const isAdmin = currentUser && currentUser.role === 'admin';
 
   return (
     <div className="home-page">
@@ -58,7 +59,11 @@ const AboutUSPage = () => {
         <div className="button-container">          
         {isLoggedIn ? (
             <>
-              <span className="login-button">{username}</span>
+          {isAdmin ? (
+                <Link to="/adminhp" className="login-button">{username}</Link>
+              ) : (
+                <Link to="/userhp" className="login-button">{username}</Link>
+              )}
               <button className="login-button" onClick={logout}>
                 Logout
               </button>
@@ -68,10 +73,14 @@ const AboutUSPage = () => {
               Login
             </button>
           )}
+          {isAdmin && ( <span className="pipe">|</span>)}
+          {isAdmin && (
+                        <button className="employee-login-button" onClick={() => navigate("/instructorregister")}>Instructor Registration</button>
+                    )}
           {isParent && ( <span className="pipe">|</span>)}
           {isParent && (
                         <button className="employee-login-button" onClick={() => navigate("/childregister")}>Child Registration</button>
-                    )}
+                    )}              
         </div>
       </header>
       <span>

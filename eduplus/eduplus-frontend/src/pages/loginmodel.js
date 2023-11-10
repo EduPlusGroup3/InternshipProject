@@ -10,9 +10,9 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
   const navigate = useNavigate();
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
-  const [username, setUsername] = useState("");
+  let [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState("user");
+  const [selectedRole, setSelectedRole] = useState("admin");
   const [error, setError] = useState("");
 
   if (!isOpen) return null;
@@ -31,6 +31,13 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
     const auth = getAuth();
   
     try {
+      console.log("first username --> ", username);
+      if(selectedRole === "student")
+      {
+        console.log("first selectedRole --> ", selectedRole);
+        username = `${username}@eduplus.com`;
+      }
+      console.log("username --> ", username);
       const userCredential = await signInWithEmailAndPassword(auth, username, password);
       const user = userCredential.user;
   
@@ -44,12 +51,13 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
         onClose(); // Close the modal
         setUsername("");
         setPassword("");
-        setSelectedRole("user"); // Reset the role to the default after login
-        navigate("/userhp");
+        setSelectedRole("admin"); // Reset the role to the default after login
+        navigate("/home");
       } else {
         setError("Invalid user role");
       }
     } catch (error) {
+      console.log("Error-->", error);
       setError("Invalid username or password");
     }
   };
