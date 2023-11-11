@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../assests/styles/registrationpagestyles.css";
 import countriesList from '../dummydata/countries';
 
-const AddFaculty = () => {
+const AddFaculty = ({facultyToUpdate }) => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState("");
   const [firstname, setFirstname] = useState("");
@@ -37,8 +36,7 @@ const AddFaculty = () => {
       !firstname ||
       !lastname ||
       !gender ||
-      !password ||
-      !confirmPassword ||
+      (!facultyToUpdate && (!password || !confirmPassword)) ||
       !country ||
       !region ||
       !gender ||
@@ -53,20 +51,61 @@ const AddFaculty = () => {
       setError("Username must be at most 8 characters long.");
     }else if (!/^\d+$/.test(mobile) || mobile.length < 10 || mobile.length > 12) {
       setError("Invalid mobile number. Please enter a valid mobile number.");      
-    }       
-  }    
+    }  
+    else {      
+      setError("");
+      //If add faculty is true then add new user else update user
+      if (isAddFaculty) {
+        // Logic to add faculty
+        console.log("Adding faculty:", {
+          userId,
+          firstname,
+          lastname,
+          gender,
+          country,
+          region,
+          pincode,
+          dob,
+          mobile,
+          password,
+          address,
+          degree,
+          profilePic,
+        });
+        //Backend logic
+      } else {
+        // Logic to update faculty
+        console.log("Updating faculty:", {
+          userId,
+          firstname,
+          lastname,
+          gender,
+          country,
+          region,
+          pincode,
+          dob,
+          mobile,
+          address,
+          degree,
+          profilePic,
+        });
+        //Backend uddate faculty logic
+      }
+      setIsAddFaculty(true); // Reset to add faculty mode      
+    }
+  }; 
 
   return (
-    <div className="registration-page">
+    <div className="user-profile">
       {isAddFaculty ? (
         <div className="registration-success">
           <h2>Faculty Added!</h2>
-          <p>Faculty successfully added. Please use your username to login</p>
+          <p>Faculty successfully added/updated. Please use your username to login</p>
           <button onClick={() => navigate("/home")}>Proceed to Home</button>
         </div>
       ) : (
-        <div className="registraton-content">
-          <h2>Add Faculty</h2>
+        <div >
+          <h2>Add/Update Faculty</h2>
           <form onSubmit={handleRegistration}>
             <div className="form-group">
               <label htmlFor="firstname">First Name:<span className="asteriskColor">*</span></label>
@@ -252,7 +291,7 @@ const AddFaculty = () => {
                 )}
               </div>
             
-            <button type="submit">Add Faculty</button>
+            <button type="submit">Add/Update Faculty</button>
           </form>
           {error && <p className="error">{error}</p>}
         </div>
