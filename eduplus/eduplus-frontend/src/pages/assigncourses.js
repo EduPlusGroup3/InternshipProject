@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "../assests/styles/registrationpagestyles.css";
 import categoryData from "../dummydata/categoryData";
+import { useNavigate } from "react-router-dom";
+import { getAuth, createUserWithEmailAndPassword} from "firebase/auth";
+import { getDatabase, ref, set, get } from "firebase/database";
+import { useAuth } from "../pages/authcontext";
+import { fetchUserProfileData } from "./firebaseFunctions";
 
 const AssignCourses = () => {
   const categoryList = ["Genio jr bot", "Duplo pieces", "Wedo1","Wedo2.0","Legokit","Kodu software","Scratch Software","EV3Robots","Arduino Kits","Webdevelopment","Programming","Tetrix","Competition training"];
-  const facultyList = ["Faculty 1", "Faculty 2", "Faculty 3"];
+  //const facultyList = ["Faculty 1", "Faculty 2", "Faculty 3"];
+  
   const { Categories } = categoryData;
 
   const [selectedFaculty, setSelectedFaculty] = useState("");
@@ -22,6 +28,28 @@ const AssignCourses = () => {
   ];
 
   useEffect(() => {}, []);
+
+  useEffect(() => {
+    const database = getDatabase();
+    const facultyRef = ref(database, "users/faculty");
+  
+    get(facultyRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const facultyData = snapshot.val();
+          const facultyNames = Object.values(facultyData).map(
+            (faculty) => `${faculty.firstname} ${faculty.lastname}`
+          );
+          setSelectedFaculty(facultyNames);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching faculty names:", error);
+      });
+  }, []);
+  
+  const facultyList = [selectedFaculty];
+
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);

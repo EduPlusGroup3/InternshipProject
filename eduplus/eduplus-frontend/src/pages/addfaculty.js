@@ -1,10 +1,7 @@
 // Import necessary libraries and dependencies
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword} from "firebase/auth";
 import { getDatabase, ref, set, get } from "firebase/database";
 import countriesList from "../dummydata/countries";
 import { useAuth } from "../pages/authcontext";
@@ -93,9 +90,9 @@ const AddFaculty = () => {
 
       if (user) {
         const database = getDatabase();
-        const usersRef = ref(database, "faculty/" + user.uid);
+        const usersRef = ref(database, "users/faculty/" + user.uid);
         const newFaculty = {
-          role: "faculty",
+          role: "instructor",
           uid: user.uid,
           firstname,
           lastname,
