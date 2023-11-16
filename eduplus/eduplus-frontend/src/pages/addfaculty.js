@@ -1,64 +1,102 @@
+// Import necessary libraries and dependencies
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import countriesList from '../dummydata/countries';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+import { getDatabase, ref, set, get } from "firebase/database";
+import countriesList from "../dummydata/countries";
+import { useAuth } from "../pages/authcontext";
+import { fetchUserProfileData } from "./firebaseFunctions";
 
-const AddFaculty = ({facultyToUpdate }) => {
+const AddFaculty = () => {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState("");
+  const { currentUser } = useAuth();
+  const [userData, setUserData] = useState(null);
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [gender, setGender] = useState("");
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
-  const [pincode, setPincode] = useState("")
+  const [pincode, setPincode] = useState("");
   const [dob, setDOB] = useState("");
-  const [mobile, setMobile]= useState("");
+  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [address, setAddress]=useState("");
-  const [degree, setDegree]= useState("");  
-  const [profilePic, setProfilePic] = useState("");
+  const [address, setAddress] = useState("");
+  const [degree, setDegree] = useState("");
+  const [profilePic, setProfilePic] = useState(null);
   const [error, setError] = useState("");
   const [countries, setCountries] = useState([]);
+  const [userId, setUserId] = useState(""); // Add this line
   const [isAddFaculty, setIsAddFaculty] = useState(false);
+  const { username: loggedInUserEmail } = useAuth();
 
   useEffect(() => {
     // Use the countriesList from the imported file
     setCountries(countriesList);
   }, []);
 
+  useEffect(() => {
+    if (currentUser) {
+      const uid = currentUser.uid;
+      fetchUserProfileData(uid)
+        .then((data) => {
+          setUserData(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user profile data:", error);
+        });
+    }
+  }, [currentUser]);
+
   const handleRegistration = async (e) => {
     e.preventDefault();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const auth = getAuth();
+    const database = getDatabase();
 
+    // Validate form fields
     if (
-      !userId ||
       !firstname ||
       !lastname ||
       !gender ||
-      (!facultyToUpdate && (!password || !confirmPassword)) ||
       !country ||
       !region ||
-      !gender ||
+      !pincode ||
+      !dob ||
+      !mobile ||
+      !password ||
+      !confirmPassword ||
       !address ||
-      !degree ||
-      !pincode
+      !degree
     ) {
       setError("All fields are required");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
-    } else if (userId.length > 8){
-      setError("Username must be at most 8 characters long.");
-    }else if (!/^\d+$/.test(mobile) || mobile.length < 10 || mobile.length > 12) {
-      setError("Invalid mobile number. Please enter a valid mobile number.");      
-    }  
-    else {      
+    } else {
       setError("");
-      //If add faculty is true then add new user else update user
-      if (isAddFaculty) {
-        // Logic to add faculty
-        console.log("Adding faculty:", {
-          userId,
+      // Construct the email address using firstname
+      const trimmedFirstname = firstname.trim().toLowerCase();
+      const constructedEmail = `${trimmedFirstname}@eduplus.com`;
+
+      // Continue with registration
+      registerFaculty(constructedEmail);
+    }
+  };
+
+  const registerFaculty = async (email) => {
+    const auth = getAuth();
+    try {
+      // Create a new faculty in Firebase Authentication
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+
+      if (user) {
+        const database = getDatabase();
+        const usersRef = ref(database, "faculty/" + user.uid);
+        const newFaculty = {
+          role: "faculty",
+          uid: user.uid,
           firstname,
           lastname,
           gender,
@@ -70,31 +108,17 @@ const AddFaculty = ({facultyToUpdate }) => {
           password,
           address,
           degree,
-          profilePic,
-        });
-        //Backend logic
-      } else {
-        // Logic to update faculty
-        console.log("Updating faculty:", {
-          userId,
-          firstname,
-          lastname,
-          gender,
-          country,
-          region,
-          pincode,
-          dob,
-          mobile,
-          address,
-          degree,
-          profilePic,
-        });
-        //Backend uddate faculty logic
-      }
-      setIsAddFaculty(true); // Reset to add faculty mode      
-    }
-  }; 
+          // Add any other faculty data as needed
+        };
+        await set(usersRef, newFaculty);
 
+        setIsAddFaculty(true);
+      }
+    } catch (error) {
+      console.error("Error registering faculty:", error.code, error.message);
+      setError("Registration failed. Please try again later.");
+    }
+  };
   return (
     <div className="user-profile">
       {isAddFaculty ? (
@@ -139,7 +163,7 @@ const AddFaculty = ({facultyToUpdate }) => {
                 name="username"
                 placeholder="User Name"
                 value={userId}
-                onChange={(e) => setLastname(e.target.value)}
+                onChange={(e) => setUserId(e.target.value)}
                 required
               />
             </div>            
@@ -280,7 +304,7 @@ const AddFaculty = ({facultyToUpdate }) => {
                   id="profilePic"
                   name="profilePic"
                   accept="image/*"
-                  onChange={(e) => setProfilePic(e.target.value)}
+                  onChange={(e) => setProfilePic(e.target.files[0])} 
                 />
                 {profilePic && (
                   <img
