@@ -28,7 +28,9 @@ const AdminHomePage = () => {
   const [isUpdateCoursesOpen, setUpdateCoursesOpen] = useState(false);
   const [isUpdateStudentOpen, setUpdateStudentOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
-
+//profile
+//add facluty
+//adminhonmepage
   const [uid, setUid] = useState(null);
 
   useEffect(() => {
@@ -62,10 +64,10 @@ const AdminHomePage = () => {
       console.error("UID is not defined.");
       return;
     }
-
+  
     const database = getDatabase();
     const userRef = ref(database, `users/${uid}`);
-
+  
     try {
       const userSnapshot = await get(userRef);
       if (userSnapshot.exists()) {
