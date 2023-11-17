@@ -23,11 +23,13 @@
   } 
   
   .upcoming-box {
-    box-shadow: 0 4px 8px rgba(170, 8, 42, 0.2);
+    /* box-shadow: 0 4px 8px rgba(170, 8, 42, 0.2); */
     padding: 20px;
     border-radius: 10px;
     position: relative;
     overflow: hidden;
+    color: white;
+    background-color:  rgb(170, 8, 42);
   }
   
   .upcoming-text {   
@@ -42,7 +44,7 @@
       opacity: 1;
     }
     to {
-      transform: translateX(30%);
+      transform: translateX(100%);
       opacity: 1;
     }
 }

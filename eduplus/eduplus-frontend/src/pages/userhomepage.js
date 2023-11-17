@@ -131,15 +131,19 @@ const UserHomePage = () => {
     setIsMyClassesOpen(false);
   };
 
+  const isParent = currentUser && currentUser.role === 'parent';
+  const isAdmin = currentUser && currentUser.role === 'admin';
+
+
+
   const menuItems = [
     { id: "profile", label: "Profile" },
-    { id: "classesPreferred", label: "Classes Preferred" },
-    { id: "myclasses", label: "My Classes" },
+    { id: "classesPreferred", label: isParent ? "Available Courses" : "Classes Preferred" },
+    { id: "myclasses", label: isParent ? "Student Classes" : "My Classes"  },
     { id: "enquiry", label: "Enquiry" },
   ];
 
-  const isParent = currentUser && currentUser.role === 'parent';
-  const isAdmin = currentUser && currentUser.role === 'admin';
+  
 
   const handleLogin = (userData) => {
     login(userData);
@@ -220,13 +224,13 @@ const UserHomePage = () => {
             profileData={profileData}
           />}
           {isClassesPreferOpen && (
-            <ClassesPreferred onClose={closeClassesPreferModal} username={username} />
+            <ClassesPreferred onClose={closeClassesPreferModal} username={username} isParent={isParent}/>
           )}
           {isEnquiryOpen && (
             <EnquiryModal onClose={closeEnquiryModal} username={username} uid={uid} />
           )}
           {ismyClassesOpen && (
-            <MyClasses onClose={closeMyClassesModal} username={username} classesData={dummyClassesData} />
+            <MyClasses onClose={closeMyClassesModal} username={username} classesData={dummyClassesData} isParent={isParent} />
           )}
         </section>
       </main>
