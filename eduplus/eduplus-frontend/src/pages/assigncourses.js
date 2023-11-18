@@ -2,16 +2,16 @@ import React, { useState, useEffect } from "react";
 import "react-time-picker/dist/TimePicker.css";
 import "../assests/styles/registrationpagestyles.css";
 import categoryData from "../dummydata/categoryData";
-import { useNavigate } from "react-router-dom";
-import { getAuth} from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword} from "firebase/auth";
 import { getDatabase, ref, set, get } from "firebase/database";
 import { useAuth } from "../pages/authcontext";
-
+import { fetchUserProfileData } from "./firebaseFunctions";
 
 const AssignCourses = () => {
   const categoryList = ["Genio jr bot", "Duplo pieces", "Wedo1","Wedo2.0","Legokit","Kodu software","Scratch Software","EV3Robots","Arduino Kits","Webdevelopment","Programming","Tetrix","Competition training"];
-  const { v4: uuidv4 } = require('uuid');
+  
   const { Categories } = categoryData;
+
   const [selectedFaculty, setSelectedFaculty] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
@@ -22,16 +22,8 @@ const AssignCourses = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [availableGroups, setAvailableGroups] = useState(["Group 1", "Group 2"]);
   const [groupsWithStudents, setGroupsWithStudents] = useState({});
-  const [error, setError] = useState("");
-  const [isCourseAdded, setIsCourseAdded] = useState(false);
-  const timeSlots = [
-    "09:00 AM - 10:30 AM",
-    "11:00 AM - 12:30 PM",
-    "02:00 PM - 03:30 PM",
-    "04:00 PM - 05:30 PM",
-  ];
 
-  useEffect(() => {}, []);
+
 
   useEffect(() => {
     const database = getDatabase();
@@ -53,6 +45,7 @@ const AssignCourses = () => {
   }, []);
   
   const facultyList = [selectedFaculty];
+
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
@@ -85,59 +78,20 @@ const AssignCourses = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Validate form fields
-    if (
-      !selectedFaculty ||
-      !selectedCategory ||
-      !selectedCourse ||
-      !courseDate ||
-      !selectedTime ||
-      !courseDescription ||
-      !courseType ||
-      !selectedGroup
-    ) {
-      setError("All fields are required");
-    } else {
-      registerCourse();
-    }
+    console.log("Submitting data:", {
+      faculty: selectedFaculty,
+      category: selectedCategory,
+      course: selectedCourse,
+      date: courseDate,
+      times: selectedTime,
+      description: courseDescription,
+      type:courseType,
+      group: selectedGroup,
+    });
+    alert("Courses Assigned");
   };
-
-  const registerCourse = async () => {
-    const auth = getAuth();
-    try {
-        const database = getDatabase();
-        const uid = uuidv4();
-        const usersRef = ref(database, "courses/" + uid);
-        const newCourse = {
-          uid: uid,
-          selectedFaculty,
-          selectedCategory,
-          selectedCourse,
-          courseDate,
-          selectedTime,
-          courseDescription,
-          courseType,
-          selectedGroup
-        };
-        await set(usersRef, newCourse);
-        setIsCourseAdded(true);
-      }catch (error) {
-      setError("Error Occured while adding course. Please try again later.");
-    }
-  };
-
 
   return (
-    <div className="course-page">
-    {isCourseAdded ? (
-      <div className="courseAdded-success">
-        <h2>Course Assigned!</h2>
-        <p>
-          Course is assigned to an instructor.
-        </p>
-      </div>
-    ) : (
     <div className="user-profile">
       <h2>Assign Courses to Faculty</h2>
       <form onSubmit={handleSubmit}>
@@ -270,11 +224,9 @@ const AssignCourses = () => {
             </select>
           </div>
         )}
-        <button type="submit">Assign Courses to Faculty</button>
+        <button type="submit">Assign</button>
       </form>
     </div>
-  )}
-  </div>
   );
 };
 

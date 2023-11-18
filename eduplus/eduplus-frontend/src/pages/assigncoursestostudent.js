@@ -4,8 +4,7 @@ import { getDatabase, ref, get } from "firebase/database";
 
 const AssignCoursesToStudent = () => {
   const fetchTimeSlotsForGroup = (group) => {
-    // Replace this with your logic to fetch time slots based on the group
-    // For demonstration purposes, let's return some dummy time slots
+
     if (group === "Group 1") {
       return [
         "2023-11-17 10:00 AM",
@@ -58,7 +57,6 @@ const AssignCoursesToStudent = () => {
     "2023-11-17 10:00 AM",
     "2023-11-18 02:30 PM",
     "2023-11-19 11:15 AM",
-    // Add more dummy time slots as needed
   ]);
 
   useEffect(() => {
@@ -131,14 +129,12 @@ const AssignCoursesToStudent = () => {
 
   const handleCourseTypeChange = (type) => {
     setCourseType(type);
-    setSelectedGroup("");
-    // If course type is "Individual", fetch and set dummy time slots
+    setSelectedGroup("");    
     if (type === "Individual") {
       setDummyTimeSlots([
         "2023-11-20 09:00 AM",
         "2023-11-21 03:45 PM",
         "2023-11-22 01:30 PM",
-        // Add more dummy time slots as needed
       ]);
     }
   };
@@ -149,11 +145,9 @@ const AssignCoursesToStudent = () => {
   
       setSelectedGroup(group);
   
-      // Fetch and set time slots based on the selected group
       const groupTimeSlots = fetchTimeSlotsForGroup(group);
       console.log("Group Time Slots:", groupTimeSlots);
   
-      // Update the selectedTime state with the fetched time slots
       setDummyTimeSlots(groupTimeSlots);
       console.log("Selected Time:", selectedTime);
       setSelectedTime([]);
@@ -340,7 +334,7 @@ const AssignCoursesToStudent = () => {
           </div>
         )}
 
-        <button type="submit">Assign Courses to Student</button>
+        <button type="submit">Assign</button>
       </form>
     </div>
   );
