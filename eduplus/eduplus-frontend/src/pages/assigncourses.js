@@ -22,9 +22,6 @@ const AssignCourses = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [availableGroups, setAvailableGroups] = useState(["Group 1", "Group 2"]);
   const [groupsWithStudents, setGroupsWithStudents] = useState({});
-
-
-  const [courseDescription, setCourseDescription] = useState("");
   const [error, setError] = useState("");
   const [isCourseAdded, setIsCourseAdded] = useState(false);
   const timeSlots = [
@@ -95,8 +92,10 @@ const AssignCourses = () => {
       !selectedCategory ||
       !selectedCourse ||
       !courseDate ||
-      !selectedTimings ||
-      !courseDescription
+      !selectedTime ||
+      !courseDescription ||
+      !courseType ||
+      !selectedGroup
     ) {
       setError("All fields are required");
     } else {
@@ -115,9 +114,11 @@ const AssignCourses = () => {
           selectedFaculty,
           selectedCategory,
           selectedCourse,
-          selectedTimings,
           courseDate,
-          courseDescription
+          selectedTime,
+          courseDescription,
+          courseType,
+          selectedGroup
         };
         await set(usersRef, newCourse);
         setIsCourseAdded(true);
