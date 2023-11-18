@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
 import { useNavigate, Link } from "react-router-dom";
-import AddFaculty from "./addfaculty";
+import UpdateFaculty from "./updatefaculty";
 import UpdateCourse from "./updatecourse"; 
-import UpdateStudent from "./updatestudent";
+import AssignCoursesToStudent from "./assigncoursestostudent";
 import AssignCourses from "./assigncourses";
 import ForgotPasswordModal from "./forgotpassword";
 import "../assests/styles/userhomepagestyles.css";
@@ -23,7 +23,7 @@ const AdminHomePage = () => {
   const [openModal, setOpenModal] = useState(null);
   const [activeLink, setActiveLink] = useState("home");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isAddFacultyOpen, setAddFacultyOpen] = useState(false);
+  const [isUpdateFacultyOpen, setUpdateFacultyOpen] = useState(false);
   const [isAssignCoursesOpen, setAssignCoursesOpen] = useState(false);
   const [isUpdateCoursesOpen, setUpdateCoursesOpen] = useState(false);
   const [isUpdateStudentOpen, setUpdateStudentOpen] = useState(false);
@@ -36,7 +36,7 @@ const AdminHomePage = () => {
   useEffect(() => {
     setActiveLink("home");
     setIsProfileOpen(true);
-    setAddFacultyOpen(false);
+    setUpdateFacultyOpen(false);
     setAssignCoursesOpen(false)
     setUpdateCoursesOpen(false);
     setUpdateStudentOpen(false);
@@ -94,31 +94,31 @@ const AdminHomePage = () => {
     if (link === "profile") {
       setIsProfileOpen(true);
       setOpenModal(null);
-      setAddFacultyOpen(false);
+      setUpdateFacultyOpen(false);
       setUpdateCoursesOpen(false);
       setUpdateStudentOpen(false);
       setAssignCoursesOpen(false);
-    } else if (link === "addfaculty") {
+    } else if (link === "updatefaculty") {
       setIsProfileOpen(false);
-      setAddFacultyOpen(true);
+      setUpdateFacultyOpen(true);
       setUpdateCoursesOpen(false);
       setUpdateStudentOpen(false);
       setAssignCoursesOpen(false);
     } else if (link === "updatecourses") {
       setIsProfileOpen(false);
-      setAddFacultyOpen(false);
+      setUpdateFacultyOpen(false);
       setUpdateCoursesOpen(true);
       setUpdateStudentOpen(false);
       setAssignCoursesOpen(false);
     } else if (link === "updatestudent") {
       setIsProfileOpen(false);
-      setAddFacultyOpen(false);
+      setUpdateFacultyOpen(false);
       setUpdateCoursesOpen(false);
       setUpdateStudentOpen(true);
       setAssignCoursesOpen(false);
     } else if (link === "assigncourses") {
       setIsProfileOpen(false);
-      setAddFacultyOpen(false);
+      setUpdateFacultyOpen(false);
       setUpdateCoursesOpen(false);
       setUpdateStudentOpen(false);
       setAssignCoursesOpen(true);
@@ -133,8 +133,8 @@ const AdminHomePage = () => {
     setIsProfileOpen(false);
   };
 
-  const closeAddFacultyModal = () => {
-    setAddFacultyOpen(false);
+  const closeUpdateFacultyModal = () => {
+    setUpdateFacultyOpen(false);
   };
 
   const closeAssignCoursesModal = () => {
@@ -151,10 +151,10 @@ const AdminHomePage = () => {
 
   const menuItems = [
     { id: "profile", label: "Profile" },
-    { id: "addfaculty", label: "Add/Update Faculty" },
-    { id: "assigncourses", label: "Assign Courses" },
+    { id: "updatefaculty", label: "Update Faculty" },
+    { id: "assigncourses", label: "Assign Courses to Faculty" },    
+    { id: "updatestudent", label: "Assign Courses to Student" },
     { id: "updatecourses", label: "Update Classes" },
-    { id: "updatestudent", label: "Update Student" },
   ];
 
   const isParent = currentUser && currentUser.role === 'parent';
@@ -237,18 +237,19 @@ const AdminHomePage = () => {
             username={username}
             profileData={profileData}
           />}
-          {isAddFacultyOpen && (
-            <AddFaculty onClose={closeAddFacultyModal} username={username} />
+          {isUpdateFacultyOpen && (
+            <UpdateFaculty onClose={closeUpdateFacultyModal} username={username} />
           )}
           {isAssignCoursesOpen && (
             <AssignCourses onClose={closeAssignCoursesModal} username={username} />
           )}
+          {isUpdateStudentOpen && (
+            <AssignCoursesToStudent onClose={closeUpdateStudentModal} username={username} classesData={dummyClassesData} />
+          )}
           {isUpdateCoursesOpen && (
             <UpdateCourse onClose={closeUpdateCoursesModal} username={username} uid={uid} />
           )}          
-          {isUpdateStudentOpen && (
-            <UpdateStudent onClose={closeUpdateStudentModal} username={username} classesData={dummyClassesData} />
-          )}
+          
         </section>
       </main>
 

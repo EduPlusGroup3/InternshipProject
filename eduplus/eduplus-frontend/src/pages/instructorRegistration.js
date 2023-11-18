@@ -1,36 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../assests/styles/registrationpagestyles.css";
-import countriesList from '../dummydata/countries';
-import {database} from '../firebase'
-import { getDatabase, ref, set, get } from "firebase/database";
-import { useAuth } from "./authcontext";
-//import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { fetchUserProfileData } from "./firebaseFunctions"; // Import the function to fetch user data
+import { getDatabase, ref, set } from "firebase/database";
+import countriesList from "../dummydata/countries";
+import { useAuth } from "./authcontext";
+import { fetchUserProfileData } from "./firebaseFunctions";
+import "../assests/styles/registrationpagestyles.css";
 
-const ChildRegistrationPage = () => {
+const AddFaculty = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [userData, setUserData] = useState(null);
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
+  const [gender, setGender] = useState("");
+  const [country, setCountry] = useState("");
+  const [dob, setDOB] = useState("");
+  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [userID, setUserId] = useState("");
-  const [email, setEmail] = useState("");
-  const [dob, setDOB] = useState("");
-  const [grade, setGrade] = useState("");
-  const [country, setCountry] = useState("");
-  const [countries, setCountries] = useState([]);
-  const [region, setRegion] = useState("");
-  const [gender, setGender] = useState("");
+  const [degree, setDegree] = useState("");
   const [error, setError] = useState("");
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [countries, setCountries] = useState([]);
+  const [userId, setUserId] = useState("");
+  const [isAddFaculty, setIsAddFaculty] = useState(false);
   const { username: loggedInUserEmail } = useAuth();
 
   useEffect(() => {
-    // Use the countriesList from the imported file
     setCountries(countriesList);
   }, []);
 
@@ -49,150 +45,89 @@ const ChildRegistrationPage = () => {
 
   const handleRegistration = async (e) => {
     e.preventDefault();
-     // Trim leading and trailing spaces from the username
-  const trimmedUsername = userID.trim();
-
+    const auth = getAuth();
+    const database = getDatabase();
 
     if (
       !firstname ||
-      // !lastname ||
-      !password ||
-      !trimmedUsername ||
-      !confirmPassword ||
-      !userID ||
-      !dob ||
-      !grade ||
+      !lastname ||
+      !gender ||
       !country ||
-      // !region ||
-      !gender
+      !dob ||
+      !mobile ||
+      !password ||
+      !confirmPassword ||
+      !degree
     ) {
-      setError("Kinldy fill all the mandatory fields!");
+      setError("All fields are required");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
-    } else if (trimmedUsername.length > 8) {
-      setError("Username must be at most 8 characters long");
-    } else if (!isAgeValid(dob)) {
-      setError("You must be at least 6 years old to register.");
     } else {
-      // Construct the email address using firstname
-      const constructedEmail = `${trimmedUsername}@eduplus.com`;
-      if (await isUserAlreadyRegistered(constructedEmail)) {
-        setError("This UserId is already taken, please choose another.");
-      } else {
-        // Set the email field with the constructed email
-        setEmail(constructedEmail);
-        // Continue with registration
-        registerUser(currentUser.uid);
-        }
+      setError("");
+      const trimmedFirstname = firstname.trim().toLowerCase();
+      const constructedEmail = `${trimmedFirstname}@eduplus.com`;
+      registerFaculty(constructedEmail);
     }
   };
 
-  const isAgeValid = (dateOfBirth) => {
-    const currentDate = new Date();
-    const birthDate = new Date(dateOfBirth);
-    const age = currentDate.getFullYear() - birthDate.getFullYear();
-    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
-
-    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
-      return age - 1 >= 6;
-    }
-
-    return age >= 6;
-  };
-
-  /*
-  const isEmailAlreadyRegistered = async (emailToCheck) => {
-    const userRef = collection(database, "users");
-    const q = query(userRef, where("email", "==", userIDToCheck));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.size > 0;
-  };
- */
-  const isUserAlreadyRegistered = async (emailToCheck) => {
-    const database = getDatabase();
-    const usersRef = ref(database, "child");
-
-    // Query the database to check if the email exists
-    const snapshot = await get(usersRef);
-
-    if (snapshot.exists()) {
-      const userData = snapshot.val();
-      for (const userId in userData) {
-        if (userData[userId].email === emailToCheck) {
-          return true; // Email already registered
-        }
-      }
-    }
-    return false; // Email not registered
-  };
-
-
-  const registerUser = async (currentUserUid) => {
+  const registerFaculty = async (email) => {
     const auth = getAuth();
     try {
-      // Create a new user in Firebase Authentication
-      console.log("email value is :", email);
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      //const userRef = collection(database, "users");
-      if(user)
-      {
+
+      if (user) {
         const database = getDatabase();
-         // Fetch the current count of children registered under the parent's node
-      const parentRef = ref(database, `users/${currentUserUid}/child`);
-      const parentSnapshot = await get(parentRef);
-      const childCount = parentSnapshot.exists() ? Object.keys(parentSnapshot.val()).length : 0;
-
-       // Create a unique key for the new child (e.g., "child1", "child2")
-       const childKey = `child${childCount + 1}`;
-
-           // Set the child's name (using the first name) as the key under the parent's node
-    const childName = firstname;
- 
-   ;
-        const usersRef = ref(database, "child/" + user.uid);
-        const newUser = {
-          role: "student",
+        const usersRef = ref(database, "users/faculty/" + user.uid);
+        const newFaculty = {
+          role: "instructor",
           uid: user.uid,
           firstname,
           lastname,
-          email,
-          dob,
-          grade,
-          country,
-          region,
           gender,
+          country,
+          dob,
+          mobile,
           password,
-          parentUid: currentUserUid, // Store the parent's UID
+          degree,
         };
-        await set(usersRef, newUser);
-        // Update the parent's data with the child's UID under the child's name (first name)
-        const parentChildRef = ref(database, `users/${currentUserUid}/child/${childName}`);
-        await set(parentChildRef, user.uid);
+        await set(usersRef, newFaculty);
 
-        setIsRegistered(true);
+        setIsAddFaculty(true);
       }
     } catch (error) {
-      console.error("Error registering user:", error);
+      console.error("Error registering faculty:", error.code, error.message);
       setError("Registration failed. Please try again later.");
     }
   };
+ 
 
   return (
     <div className="registration-page">
-      {isRegistered ? (
+      {isAddFaculty ? (
         <div className="registration-success">
-          <h2>Registration Successful!</h2>
-          <p>
-            Your registration is complete. Your First Name will be your UserName. You can now proceed to the Home page.
-          </p>
+          <h2>Faculty Added!</h2>
+          <p>Faculty successfully Added. Please use your email to login</p>
           <button onClick={() => navigate("/home")}>Proceed to Home</button>
         </div>
       ) : (
         <div className="registraton-content">
-          <h2>Child Registration</h2>
+          <h2>Instructor Registration</h2>
           <form onSubmit={handleRegistration}>
+          <div className="form-group">
+            <label htmlFor="email">Email:</label>
+            <div>
+              <input
+                type="text"
+                id="email"
+                name="email"
+                placeholder="Email"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+              />             
+            </div>
+          </div>
             <div className="form-group">
-              <label htmlFor="firstname">First Name<span className="asteriskColor">*</span></label>
+              <label htmlFor="firstname">First Name:<span className="asteriskColor">*</span></label>
               <input
                 type="text"
                 id="firstname"
@@ -200,10 +135,11 @@ const ChildRegistrationPage = () => {
                 placeholder="First Name"
                 value={firstname}
                 onChange={(e) => setFirstname(e.target.value)}
+                required
               />
             </div>
             <div className="form-group">
-              <label htmlFor="lastname">Last Name</label>
+              <label htmlFor="lastname">Last Name:<span className="asteriskColor">*</span></label>
               <input
                 type="text"
                 id="lastname"
@@ -211,8 +147,54 @@ const ChildRegistrationPage = () => {
                 placeholder="Last Name"
                 value={lastname}
                 onChange={(e) => setLastname(e.target.value)}
+                required
+              />
+            </div>                       
+            <div className="form-group">
+              <label htmlFor="gender">Gender<span className="asteriskColor">*</span></label>
+              <select
+                id="gender"
+                name="gender"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>              
+            </div>
+            <div className="form-group">
+              <label htmlFor="country">Country<span className="asteriskColor">*</span></label>
+              <select
+                id="country"
+                name="country"
+                placeholder="Country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                required
+              >
+                <option value="">Select Country</option>
+                {countriesList.map((countryOption) => (
+                  <option key={countryOption} value={countryOption}>
+                    {countryOption}
+                  </option>
+                ))}
+              </select>
+            </div>  
+            <div className="form-group">
+              <label htmlFor="dob">Date of Birth:<span className="asteriskColor">*</span></label>
+              <input
+                type="date"
+                id="dob"
+                name="dob"
+                value={dob}
+                onChange={(e) => setDOB(e.target.value)}
+                required
               />
             </div>
+                     
             <div className="form-group">
               <label htmlFor="password">Password<span className="asteriskColor">*</span></label>
               <input
@@ -222,6 +204,7 @@ const ChildRegistrationPage = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             <div className="form-group">
@@ -233,90 +216,45 @@ const ChildRegistrationPage = () => {
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                required
               />
             </div>
             <div className="form-group">
-              <label htmlFor="userID">Username<span className="asteriskColor">*</span></label>
+              <label htmlFor="mobile">Mobile:</label>
               <input
-                type="username"
-                id="username"
-                name="username"
-                placeholder="Username"
-                value={userID}
-                maxLength="8"  
-                onChange={(e) => setUserId(e.target.value)}             
+                type="tel"
+                id="mobile"
+                name="mobile"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
               />
-            </div>
+            </div>  
             <div className="form-group">
-              <label htmlFor="dob">Date of Birth<span className="asteriskColor">*</span></label>
-              <input
-                type="date"
-                id="dob"
-                name="dob"
-                value={dob}
-                onChange={(e) => setDOB(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="grade">Grade in School<span className="asteriskColor">*</span></label>
-              <input
-                type="text"
-                id="grade"
-                name="grade"
-                placeholder="Grade"
-                value={grade}
-                onChange={(e) => setGrade(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="country">Country<span className="asteriskColor">*</span></label>
-              <select
-                id="country"
-                name="country"
-                placeholder="Country"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-              >
-                <option value="">Select Country</option>
-                {countriesList.map((countryOption) => (
-                  <option key={countryOption} value={countryOption}>
-                    {countryOption}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="region">Region</label>
-              <input
-                type="text"
-                id="region"
-                name="region"
-                placeholder="Region"
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="gender">Gender<span className="asteriskColor">*</span></label>
-              <select
-                id="gender"
-                name="gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            <button type="submit">REGISTER</button>
+                <label htmlFor="degree">Highest Level of Degree:<span className="asteriskColor">*</span></label>
+                <select
+                  id="degree"
+                  name="degree"
+                  value={degree}
+                  onChange={(e) => setDegree(e.target.value)}
+                  required
+                >
+                  <option value="">Select Degree</option>
+                  <option value="High School">High School</option>
+                  <option value="Associate's Degree">Associate's Degree</option>
+                  <option value="Bachelor's Degree">Bachelor's Degree</option>
+                  <option value="Master's Degree">Master's Degree</option>
+                  <option value="Doctoral Degree">Doctoral Degree</option>
+                </select>
+              </div>               
+            
+            <button type="submit">Register Faculty</button>
           </form>
           {error && <p className="error">{error}</p>}
         </div>
       )}
     </div>
   );
-};
+};         
 
-export default ChildRegistrationPage;
+
+export default AddFaculty;
