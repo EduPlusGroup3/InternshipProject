@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from "react";
 import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
-import { useNavigate,Link } from "react-router-dom";
-import MyClasses from "./myclasses";
-import EnquiryModal from "./enquiry"; 
-import ClassesPreferred from "./classespreferred";
+import { useNavigate, Link } from "react-router-dom";
+import UpdateFaculty from "./updatefaculty";
+import UpdateCourse from "./updatecourse"; 
+import AssignCoursesToStudent from "./assigncoursestostudent";
+import AssignCourses from "./assigncourses";
 import ForgotPasswordModal from "./forgotpassword";
 import "../assests/styles/userhomepagestyles.css";
 import genioLogo from "../assests/images/genioLogo1.png";
 import genioLogoFooter from "../assests/images/genioLogoFooter.png";
 import VerticalMenu from "./verticalmenu";
-import { useAuth } from "../pages/authcontext";
+import { useAuth } from "./authcontext";
 import dummyClassesData from "../dummydata/classesAttended";
 import { getDatabase, ref, get } from "firebase/database";
 
-const UserHomePage = () => {
+const AdminHomePage = () => {
   const navigate = useNavigate();
   const { isLoggedIn, username, login, logout, currentUser } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -22,19 +23,23 @@ const UserHomePage = () => {
   const [openModal, setOpenModal] = useState(null);
   const [activeLink, setActiveLink] = useState("home");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isClassesPreferOpen, setIsClassesPreferOpen] = useState(false);
-  const [ismyClassesOpen, setIsMyClassesOpen] = useState(false);
-  const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+  const [isUpdateFacultyOpen, setUpdateFacultyOpen] = useState(false);
+  const [isAssignCoursesOpen, setAssignCoursesOpen] = useState(false);
+  const [isUpdateCoursesOpen, setUpdateCoursesOpen] = useState(false);
+  const [isUpdateStudentOpen, setUpdateStudentOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
-
+//profile
+//add facluty
+//adminhonmepage
   const [uid, setUid] = useState(null);
 
   useEffect(() => {
     setActiveLink("home");
     setIsProfileOpen(true);
-    setIsClassesPreferOpen(false);
-    setIsEnquiryOpen(false);
-    setIsMyClassesOpen(false);
+    setUpdateFacultyOpen(false);
+    setAssignCoursesOpen(false)
+    setUpdateCoursesOpen(false);
+    setUpdateStudentOpen(false);
   }, []);
 
   const openLoginModal = () => {
@@ -59,10 +64,10 @@ const UserHomePage = () => {
       console.error("UID is not defined.");
       return;
     }
-
+  
     const database = getDatabase();
     const userRef = ref(database, `users/${uid}`);
-
+  
     try {
       const userSnapshot = await get(userRef);
       if (userSnapshot.exists()) {
@@ -89,25 +94,34 @@ const UserHomePage = () => {
     if (link === "profile") {
       setIsProfileOpen(true);
       setOpenModal(null);
-      setIsClassesPreferOpen(false);
-      setIsEnquiryOpen(false);
-      setIsMyClassesOpen(false);
-    } else if (link === "classesPreferred") {
-      setIsClassesPreferOpen(true);
+      setUpdateFacultyOpen(false);
+      setUpdateCoursesOpen(false);
+      setUpdateStudentOpen(false);
+      setAssignCoursesOpen(false);
+    } else if (link === "updatefaculty") {
       setIsProfileOpen(false);
-      setIsEnquiryOpen(false);
-      setIsMyClassesOpen(false);
-    } else if (link === "myclasses") {
-      setIsClassesPreferOpen(false);
+      setUpdateFacultyOpen(true);
+      setUpdateCoursesOpen(false);
+      setUpdateStudentOpen(false);
+      setAssignCoursesOpen(false);
+    } else if (link === "updatecourses") {
       setIsProfileOpen(false);
-      setIsEnquiryOpen(false);
-      setIsMyClassesOpen(true);
-    } else if (link === "enquiry") {
-      console.log("Enquiry link clicked");
-      setIsClassesPreferOpen(false);
+      setUpdateFacultyOpen(false);
+      setUpdateCoursesOpen(true);
+      setUpdateStudentOpen(false);
+      setAssignCoursesOpen(false);
+    } else if (link === "updatestudent") {
       setIsProfileOpen(false);
-      setIsEnquiryOpen(true);
-      setIsMyClassesOpen(false);
+      setUpdateFacultyOpen(false);
+      setUpdateCoursesOpen(false);
+      setUpdateStudentOpen(true);
+      setAssignCoursesOpen(false);
+    } else if (link === "assigncourses") {
+      setIsProfileOpen(false);
+      setUpdateFacultyOpen(false);
+      setUpdateCoursesOpen(false);
+      setUpdateStudentOpen(false);
+      setAssignCoursesOpen(true);
     } else {
       setActiveLink(link);
       setOpenModal(link);
@@ -119,31 +133,32 @@ const UserHomePage = () => {
     setIsProfileOpen(false);
   };
 
-  const closeClassesPreferModal = () => {
-    setIsClassesPreferOpen(false);
+  const closeUpdateFacultyModal = () => {
+    setUpdateFacultyOpen(false);
   };
 
-  const closeEnquiryModal = () => {
-    setIsEnquiryOpen(false);
+  const closeAssignCoursesModal = () => {
+    setAssignCoursesOpen(false);
   };
 
-  const closeMyClassesModal = () => {
-    setIsMyClassesOpen(false);
+  const closeUpdateCoursesModal = () => {
+    setUpdateCoursesOpen(false);
   };
 
-  const isParent = currentUser && currentUser.role === 'parent';
-  const isAdmin = currentUser && currentUser.role === 'admin';
-
-
+  const closeUpdateStudentModal = () => {
+    setUpdateStudentOpen(false);
+  };
 
   const menuItems = [
     { id: "profile", label: "Profile" },
-    { id: "classesPreferred", label: isParent ? "Available Courses" : "Classes Preferred" },
-    { id: "myclasses", label: isParent ? "Student Classes" : "My Classes"  },
-    { id: "enquiry", label: "Enquiry" },
+    { id: "updatefaculty", label: "Update Faculty" },
+    { id: "assigncourses", label: "Assign Courses to Faculty" },    
+    { id: "updatestudent", label: "Assign Courses to Student" },
+    { id: "updatecourses", label: "Update Classes" },
   ];
 
-  
+  const isParent = currentUser && currentUser.role === 'parent';
+  const isAdmin = currentUser && currentUser.role === 'admin';
 
   const handleLogin = (userData) => {
     login(userData);
@@ -184,10 +199,9 @@ const UserHomePage = () => {
         </div>
       </header>
       <span>
-      
         <nav className="userhpnavigation">
           <a
-            href="/home" 
+            href="/home"
             className={`hpnav-link ${activeLink === "geniotech" ? "active" : ""}`}
             onClick={() => handleNavLinkClick("geniotech")}
           >
@@ -223,15 +237,19 @@ const UserHomePage = () => {
             username={username}
             profileData={profileData}
           />}
-          {isClassesPreferOpen && (
-            <ClassesPreferred onClose={closeClassesPreferModal} username={username} isParent={isParent}/>
+          {isUpdateFacultyOpen && (
+            <UpdateFaculty onClose={closeUpdateFacultyModal} username={username} />
           )}
-          {isEnquiryOpen && (
-            <EnquiryModal onClose={closeEnquiryModal} username={username} uid={uid} />
+          {isAssignCoursesOpen && (
+            <AssignCourses onClose={closeAssignCoursesModal} username={username} />
           )}
-          {ismyClassesOpen && (
-            <MyClasses onClose={closeMyClassesModal} username={username} classesData={dummyClassesData} isParent={isParent} />
+          {isUpdateStudentOpen && (
+            <AssignCoursesToStudent onClose={closeUpdateStudentModal} username={username} classesData={dummyClassesData} />
           )}
+          {isUpdateCoursesOpen && (
+            <UpdateCourse onClose={closeUpdateCoursesModal} username={username} uid={uid} />
+          )}          
+          
         </section>
       </main>
 
@@ -265,4 +283,4 @@ const UserHomePage = () => {
   );
 };
 
-export default UserHomePage;
+export default AdminHomePage;

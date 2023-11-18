@@ -5,9 +5,22 @@ import image2 from "../assests/images/image2.jpg";
 import image3 from "../assests/images/image3.jpg";
 import image4 from "../assests/images/image4.jpg";
 
-const ClassesPreferred = ({ onClose, username }) => {
+
+const ClassesPreferred = ({ onClose, username , isParent}) => {
   return (
-    <div className='cards'>
+    <div className="user-profile">
+      <div className="profile-content">       
+        {isParent ? (
+          // Render content for admin
+          <h2>Available Courses</h2>
+        ) : (
+          // Render content for non-admin
+          <h2>Classes Preferred</h2>
+        )}
+        <p>Username: {username}</p>
+
+        
+      <div className='cards'>
       <h1>Check out these Courses!</h1>
       <div className='cards__container'>
         <div className='cards__wrapper'>
@@ -59,6 +72,8 @@ const ClassesPreferred = ({ onClose, username }) => {
           </ul>
         </div>
       </div>
+    </div>
+    </div>
     </div>
   );
 };
