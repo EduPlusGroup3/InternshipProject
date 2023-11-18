@@ -179,10 +179,17 @@
     outline: none;
     border-color: rgb(170, 8, 42);
     box-shadow: 0 0 5px rgba(170, 8, 42, 0.5);
+  }  
+
+  input[type="radio"] {
+    margin-right: 5px; /* Adjust as needed */
+    background-color: transparent;
+    border: 1px solid #000; /* You can set the border color to your preference */
+    border-radius: 50%;
+    padding: 0;
+    width: 16px; /* Adjust as needed */
+    height: 16px; /* Adjust as needed */
   }
-  
-  /* ... (remaining styles) */
-  
   
   .footer {
     background-color: rgb(40, 61, 90);
@@ -286,4 +293,21 @@
 
 
   }
+  .search-input {
+    position: relative;
+  }
+  
+  .search-icon-container {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  
+  .search-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
   

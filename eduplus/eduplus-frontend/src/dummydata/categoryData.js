@@ -2,12 +2,45 @@ const categoryData = {
     "Categories": [
       {
         "CategoryName": "Genio jr bot",
+        "Faculties": ["Faculty A", "Faculty B", "Faculty C"],
         "Courses": [
-          {"CourseName": "Early Robotics", "Description": "Kids will be introduced to programming by learning to give the robot very simple orders like going forward, backward, right, left and pause. They will have different fun missions to accomplish."},
-          {"CourseName": "RoboRescue", "Description": "Kids will learn about different animals and their habitats, they will program a robot that will help our animals to go safely to their suitable habitat."},
-          {"CourseName": "Robotraveler", "Description": "Kids will learn aboutour world, its continents and the different countries, they will program a robot that will help people go back to their home country."},
-          {"CourseName": "RoboScientist", "Description": "Kids will learn about different science topics"}
-        ]
+          {
+            "CourseName": "Early Robotics",
+            "Description": "Kids will be introduced to programming by learning to give the robot very simple orders like going forward, backward, right, left and pause. They will have different fun missions to accomplish.",
+            "FacultyTypes": {
+              "Faculty A": ["Individual", "Group"],
+              "Faculty B": ["Individual"],
+              "Faculty C": ["Group"],
+            },
+          },
+          {
+            "CourseName": "RoboRescue",
+            "Description": "Kids will learn about different animals and their habitats, they will program a robot that will help our animals to go safely to their suitable habitat.",
+            "FacultyTypes": {
+              "Faculty A": ["Individual"],
+              "Faculty B": ["Group"],
+              "Faculty C": ["Group"],
+            },
+          },
+          {
+            "CourseName": "Robotraveler",
+            "Description": "Kids will learn about our world, its continents and the different countries, they will program a robot that will help people go back to their home country.",
+            "FacultyTypes": {
+              "Faculty A": ["Individual", "Group"],
+              "Faculty B": ["Individual"],
+              "Faculty C": ["Group"],
+            },
+          },
+          {
+            "CourseName": "RoboScientist",
+            "Description": "Kids will learn about different science topics",
+            "FacultyTypes": {
+              "Faculty A": ["Group"],
+              "Faculty B": ["Individual"],
+              "Faculty C": ["Group"],
+            },
+          },
+        ],
       },
       {
         "CategoryName": "Duplo pieces",

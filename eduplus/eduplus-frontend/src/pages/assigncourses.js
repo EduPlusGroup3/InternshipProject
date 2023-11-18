@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
+import "react-time-picker/dist/TimePicker.css";
 import "../assests/styles/registrationpagestyles.css";
 import categoryData from "../dummydata/categoryData";
-import { useNavigate } from "react-router-dom";
 import { getAuth, createUserWithEmailAndPassword} from "firebase/auth";
 import { getDatabase, ref, set, get } from "firebase/database";
 import { useAuth } from "../pages/authcontext";
@@ -9,25 +9,21 @@ import { fetchUserProfileData } from "./firebaseFunctions";
 
 const AssignCourses = () => {
   const categoryList = ["Genio jr bot", "Duplo pieces", "Wedo1","Wedo2.0","Legokit","Kodu software","Scratch Software","EV3Robots","Arduino Kits","Webdevelopment","Programming","Tetrix","Competition training"];
-  //const facultyList = ["Faculty 1", "Faculty 2", "Faculty 3"];
   
   const { Categories } = categoryData;
 
   const [selectedFaculty, setSelectedFaculty] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
-  const [selectedTimings, setSelectedTimings] = useState([]);
+  const [selectedTime, setSelectedTime] = useState([]);
   const [courseDate, setCourseDate] = useState("");
-  const [courseDescription, setCourseDescription] = useState("");
+  const [courseDescription, setCourseDescription] = useState(""); 
+  const [courseType, setCourseType] = useState(""); 
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [availableGroups, setAvailableGroups] = useState(["Group 1", "Group 2"]);
+  const [groupsWithStudents, setGroupsWithStudents] = useState({});
 
-  const timeSlots = [
-    "09:00 AM - 10:30 AM",
-    "11:00 AM - 12:30 PM",
-    "02:00 PM - 03:30 PM",
-    "04:00 PM - 05:30 PM",
-  ];
 
-  useEffect(() => {}, []);
 
   useEffect(() => {
     const database = getDatabase();
@@ -67,14 +63,18 @@ const AssignCourses = () => {
   };
 
   const handleTimeChange = (time) => {
-    if (selectedTimings.includes(time)) {
-      setSelectedTimings((prevTimings) =>
-        prevTimings.filter((t) => t !== time)
-      );
-    } else {
-      setSelectedTimings((prevTimings) => [...prevTimings, time]);
-    }
+    setSelectedTime(time);
   };
+
+  const handleCourseTypeChange = (type) => {
+    setCourseType(type);
+    setSelectedGroup("");
+  };
+
+  const handleGroupChange = (group) => {   
+      setSelectedGroup(group);    
+  };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -83,15 +83,17 @@ const AssignCourses = () => {
       category: selectedCategory,
       course: selectedCourse,
       date: courseDate,
-      times: selectedTimings,
+      times: selectedTime,
       description: courseDescription,
+      type:courseType,
+      group: selectedGroup,
     });
     alert("Courses Assigned");
   };
 
   return (
     <div className="user-profile">
-      <h2>Assign Courses</h2>
+      <h2>Assign Courses to Faculty</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="faculty">Select Faculty:</label>
@@ -178,28 +180,51 @@ const AssignCourses = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="courseTimes">Select Course Times:</label>
+          <label htmlFor="courseTime">Select Course Time:</label>
+          <input
+            type="time"
+            id="courseTime"
+            name="courseTime"
+            value={selectedTime}
+            onChange={handleTimeChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="courseType">Select Course Type:</label>
           <select
-            id="courseTimes"
-            name="courseTimes"
-            multiple
-            value={selectedTimings}
-            onChange={(e) =>
-              handleTimeChange(
-                Array.from(e.target.selectedOptions, (option) => option.value)
-              )
-            }
+            id="courseType"
+            name="courseType"
+            value={courseType}
+            onChange={(e) => handleCourseTypeChange(e.target.value)}
             required
           >
-            {timeSlots.map((time) => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
+            <option value="">Select Course Type</option>
+            <option value="Individual">Individual</option>
+            <option value="Group">Group</option>
           </select>
         </div>
 
-        <button type="submit">Assign Courses</button>
+        {courseType === "Group" && (
+          <div className="form-group">
+            <label htmlFor="group">Available Groups:</label>
+            <select
+              id="group"
+              name="group"
+              value={selectedGroup}  
+              onChange={(e) => handleGroupChange(e.target.value)}
+              required
+            >
+              <option value="">Select Group</option>
+              {availableGroups.map((group) => (
+                <option key={group} value={group}>
+                  {group}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <button type="submit">Assign Courses to Faculty</button>
       </form>
     </div>
   );
