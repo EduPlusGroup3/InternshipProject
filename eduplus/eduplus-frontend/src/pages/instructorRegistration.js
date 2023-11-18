@@ -13,6 +13,7 @@ const AddFaculty = () => {
   const [userData, setUserData] = useState(null);
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
+  const [email,setEmail] = useState("");
   const [gender, setGender] = useState("");
   const [country, setCountry] = useState("");
   const [dob, setDOB] = useState("");
@@ -49,6 +50,7 @@ const AddFaculty = () => {
     const database = getDatabase();
 
     if (
+   
       !firstname ||
       !lastname ||
       !gender ||
@@ -81,6 +83,7 @@ const AddFaculty = () => {
         const newFaculty = {
           role: "instructor",
           uid: user.uid,
+          email,
           firstname,
           lastname,
           gender,

@@ -43,8 +43,9 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
   
       // Check if the user role matches the role in the database
       const userRole = await getUserRoleFromDatabase(user.uid); // Implement this function to get the role from your database
-  //  console.log(userRole);
-  //  console.log(selectedRole);
+  console.log(userRole);
+  console.log(selectedRole);
+
       if (userRole === selectedRole) {
         onLogin({ username: user.email, role: selectedRole,uid:user.uid }); // Adjust this based on your user data structure
         setError("");
