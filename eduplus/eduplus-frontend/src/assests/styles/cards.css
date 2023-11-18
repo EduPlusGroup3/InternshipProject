@@ -68,6 +68,7 @@
     color: #fff;
     background-color: #1f98f4;
     box-sizing: border-box;
+    overflow: hidden;
   }
   
   .cards__item__img {
@@ -86,7 +87,7 @@
   }
   
   .cards__item__img:hover {
-    transform: scale(1.3);
+    transform: scale(1.);
   }
   
   .cards__item__info {
