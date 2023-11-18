@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { fetchUserProfileData } from "./firebaseFunctions"; // Import the function to fetch user data
-import { useAuth } from "../pages/authcontext"; // Import the useAuth hook
+import { fetchUserProfileData } from "./firebaseFunctions";
+import { useAuth } from "../pages/authcontext";
 
 const UserProfile = () => {
-  const { currentUser } = useAuth(); // Get the currently authenticated user
+  const { currentUser } = useAuth();
   const [userData, setUserData] = useState({
     firstname: "",
     lastname: "",
@@ -11,12 +11,13 @@ const UserProfile = () => {
     country: "",
     region: "",
     gender: "",
+    grade: "", // New field for grade
+    course: "", // New field for course
   });
 
   useEffect(() => {
-    // Fetch user data if a user is authenticated
     if (currentUser) {
-      const uid = currentUser.uid; // Use the user's uid as the path
+      const uid = currentUser.uid;
       const fetchData = async () => {
         const data = await fetchUserProfileData(uid);
         if (data) {
@@ -98,6 +99,33 @@ const UserProfile = () => {
             readOnly
           />
         </div>
+        {userData.grade && ( 
+          <div className="form-group">
+            <label htmlFor="grade">Grade</label>
+            <input
+              type="text"
+              id="grade"
+              name="grade"
+              placeholder="Grade"
+              value={userData.grade}
+              readOnly
+            />
+          </div>
+        )}
+        {userData.course && (
+          <div className="form-group">
+            <label htmlFor="course">Course</label>
+            <select
+              id="course"
+              name="course"
+              value={userData.course}
+              readOnly
+            >
+              <option value="option1">Option 1</option>
+              <option value="option2">Option 2</option>
+            </select>
+          </div>
+        )}
       </form>
     </div>
   );
