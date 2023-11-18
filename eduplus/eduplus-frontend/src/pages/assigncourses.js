@@ -3,15 +3,17 @@ import "react-time-picker/dist/TimePicker.css";
 import "../assests/styles/registrationpagestyles.css";
 import categoryData from "../dummydata/categoryData";
 import { getAuth, createUserWithEmailAndPassword} from "firebase/auth";
-import { getDatabase, ref, set, get } from "firebase/database";
+import { getDatabase, ref,push, set, get } from "firebase/database";
 import { useAuth } from "../pages/authcontext";
 import { fetchUserProfileData } from "./firebaseFunctions";
+import { v4 as uuidv4 } from 'uuid';
+
 
 const AssignCourses = () => {
   const categoryList = ["Genio jr bot", "Duplo pieces", "Wedo1","Wedo2.0","Legokit","Kodu software","Scratch Software","EV3Robots","Arduino Kits","Webdevelopment","Programming","Tetrix","Competition training"];
   
   const { Categories } = categoryData;
-
+  const [faculties, setFaculties] = useState([]);
   const [selectedFaculty, setSelectedFaculty] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
@@ -28,15 +30,16 @@ const AssignCourses = () => {
   useEffect(() => {
     const database = getDatabase();
     const facultyRef = ref(database, "users/faculty");
-  
+
     get(facultyRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
           const facultyData = snapshot.val();
-          const facultyNames = Object.values(facultyData).map(
-            (faculty) => `${faculty.firstname} ${faculty.lastname}`
-          );
-          setSelectedFaculty(facultyNames);
+          const faculties = Object.values(facultyData).map((faculty) => ({
+            id: faculty.id, // replace with your actual user ID field
+            name: `${faculty.firstname} ${faculty.lastname}`,
+          }));
+          setFaculties(faculties)
         }
       })
       .catch((error) => {
@@ -44,7 +47,6 @@ const AssignCourses = () => {
       });
   }, []);
   
-  const facultyList = [selectedFaculty];
 
 
   const handleCategoryChange = (category) => {
@@ -62,8 +64,16 @@ const AssignCourses = () => {
     setCourseDescription(selectedCourseData?.Description || "");
   };
 
-  const handleTimeChange = (time) => {
-    setSelectedTime(time);
+  const handleTimeChange = (e) => {
+    try {
+      const parsedTime = new Date(`2000-01-01T${e.target.value}`);
+      if (isNaN(parsedTime.getTime())) {
+        throw new Error('Invalid time format');
+      }
+      setSelectedTime(e.target.value);
+    } catch (error) {
+      console.error('Error setting time:', error);
+    }
   };
 
   const handleCourseTypeChange = (type) => {
@@ -78,6 +88,33 @@ const AssignCourses = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const database = getDatabase();
+    const coursesRef = ref(database, "courses");
+  
+    const courseData = {
+      uid: uuidv4(), // Generate a UUID for the course
+      selectedFaculty: selectedFaculty,
+      selectedCategory: selectedCategory,
+      selectedCourse: selectedCourse,
+      courseDate: courseDate,
+      selectedTimings: selectedTime,
+      courseDescription: courseDescription,
+    };
+     // Perform asynchronous operation outside the event handler
+  const saveCourseData = async () => {
+    try {
+      const newCourseRef = await push(coursesRef);
+      await set(newCourseRef, courseData);
+      alert("Courses Assigned");
+    } catch (error) {
+      console.error("Error assigning courses:", error);
+      alert("An error occurred while assigning courses. Please try again.");
+    }
+  };
+
+  // Trigger the asynchronous operation
+  saveCourseData();
+
     console.log("Submitting data:", {
       faculty: selectedFaculty,
       category: selectedCategory,
@@ -88,7 +125,7 @@ const AssignCourses = () => {
       type:courseType,
       group: selectedGroup,
     });
-    alert("Courses Assigned");
+   // alert("Courses Assigned");
   };
 
   return (
@@ -105,9 +142,9 @@ const AssignCourses = () => {
             required
           >
             <option value="">Select Faculty</option>
-            {facultyList.map((faculty) => (
-              <option key={faculty} value={faculty}>
-                {faculty}
+            {faculties.map((faculty) => (
+              <option key={faculty.id} value={faculty.id}>
+                {faculty.name}
               </option>
             ))}
           </select>
