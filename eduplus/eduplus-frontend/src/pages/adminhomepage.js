@@ -3,7 +3,7 @@ import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
 import { useNavigate, Link } from "react-router-dom";
 import UpdateFaculty from "./updatefaculty";
-import UpdateCourse from "./updatecourse"; 
+import RescheduleCourse from "./updatecourse"; 
 import AssignCoursesToStudent from "./assigncoursestostudent";
 import AssignCourses from "./assigncourses";
 import ForgotPasswordModal from "./forgotpassword";
@@ -14,6 +14,7 @@ import VerticalMenu from "./verticalmenu";
 import { useAuth } from "./authcontext";
 import dummyClassesData from "../dummydata/classesAttended";
 import { getDatabase, ref, get } from "firebase/database";
+
 
 const AdminHomePage = () => {
   const navigate = useNavigate();
@@ -104,7 +105,7 @@ const AdminHomePage = () => {
       setUpdateCoursesOpen(false);
       setUpdateStudentOpen(false);
       setAssignCoursesOpen(false);
-    } else if (link === "updatecourses") {
+    } else if (link === "reschedulecourse") {
       setIsProfileOpen(false);
       setUpdateFacultyOpen(false);
       setUpdateCoursesOpen(true);
@@ -154,7 +155,7 @@ const AdminHomePage = () => {
     { id: "updatefaculty", label: "Update Faculty" },
     { id: "assigncourses", label: "Assign Courses to Faculty" },    
     { id: "updatestudent", label: "Assign Courses to Student" },
-    { id: "updatecourses", label: "Update Classes" },
+    { id: "reschedulecourse", label: "Reschedule Course" },
   ];
 
   const isParent = currentUser && currentUser.role === 'parent';
@@ -247,7 +248,7 @@ const AdminHomePage = () => {
             <AssignCoursesToStudent onClose={closeUpdateStudentModal} username={username} classesData={dummyClassesData} />
           )}
           {isUpdateCoursesOpen && (
-            <UpdateCourse onClose={closeUpdateCoursesModal} username={username} uid={uid} />
+            <RescheduleCourse onClose={closeUpdateCoursesModal} username={username} uid={uid} />
           )}          
           
         </section>

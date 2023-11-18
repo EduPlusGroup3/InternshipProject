@@ -224,7 +224,7 @@ const AssignCourses = () => {
             </select>
           </div>
         )}
-        <button type="submit">Assign Courses to Faculty</button>
+        <button type="submit">Assign</button>
       </form>
     </div>
   );
