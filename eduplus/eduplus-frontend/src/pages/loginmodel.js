@@ -73,7 +73,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
   
   const getUserRoleFromDatabase = async (uid) => {
     const database = getDatabase();
-    const userRoleRef = ref(database, `users/${uid}/role`);
+    const userRoleRef = ref(database, `users/faculty/${uid}/role`);
   
     try {
       const userRoleSnapshot = await get(userRoleRef);
