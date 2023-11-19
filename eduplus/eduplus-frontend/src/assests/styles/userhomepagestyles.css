@@ -190,6 +190,16 @@
     width: 16px; /* Adjust as needed */
     height: 16px; /* Adjust as needed */
   }
+
+  input[type="checkbox"] {
+    margin-right: 5px; /* Adjust as needed */
+    background-color: transparent;
+    border: 1px solid #000; /* You can set the border color to your preference */
+    border-radius: 50%;
+    padding: 0;
+    width: 16px; /* Adjust as needed */
+    height: 16px; /* Adjust as needed */
+  }
   
   .footer {
     background-color: rgb(40, 61, 90);

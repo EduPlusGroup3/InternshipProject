@@ -103,7 +103,7 @@ const RescheduleCourse = () => {
       <h2>Reschedule Course</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="email">Email:</label>
+          <label htmlFor="email">Faculty Email:</label>
           <div className="search-input">
             <input
               type="text"
