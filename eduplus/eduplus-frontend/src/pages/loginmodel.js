@@ -42,15 +42,20 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
       const user = userCredential.user;
       let userRole
       // Check if the user role matches the role in the database
-      if(selectedRole === "student")
+
+      switch(selectedRole)
       {
-        userRole = await getStudentRoleFromDatabase(user.uid); // Implement this function to get the role from your database
+        case "student" :
+          userRole = await getStudentRoleFromDatabase(user.uid);
+          break;
+        case "faculty" :
+          userRole = await getFacultyRoleFromDatabase(user.uid);
+          break;
+        default:
+          userRole = await getUserRoleFromDatabase(user.uid);
+          break;      
       }
-      else
-      {
-        userRole = await getUserRoleFromDatabase(user.uid); // Implement this function to get the role from your database
-      }
-      
+
       console.log(userRole);
       console.log(selectedRole);
 
@@ -73,7 +78,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
   
   const getUserRoleFromDatabase = async (uid) => {
     const database = getDatabase();
-    const userRoleRef = ref(database, `users/faculty/${uid}/role`);
+    const userRoleRef = ref(database, `users/${uid}/role`);
   
     try {
       const userRoleSnapshot = await get(userRoleRef);
@@ -87,6 +92,22 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
     }
   };
   
+  const getFacultyRoleFromDatabase = async (uid) => {
+    const database = getDatabase();
+    const userRoleRef = ref(database, `users/faculty/${uid}/role`);
+  
+    try {
+      const userRoleSnapshot = await get(userRoleRef);
+      if (userRoleSnapshot.exists()) {
+        return userRoleSnapshot.val();
+      }
+      return null; // User role not found
+    } catch (error) {
+      console.error("Error getting user role from database:", error);
+      return null; // Handle the error as needed
+    }
+  };
+
   const getStudentRoleFromDatabase = async (uid) => {
     const database = getDatabase();
     const userRoleRef = ref(database, `child/${uid}/role`);
