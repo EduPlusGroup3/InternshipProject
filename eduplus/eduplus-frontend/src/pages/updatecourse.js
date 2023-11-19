@@ -66,7 +66,7 @@ const RescheduleCourse = () => {
     setShowConfirmation(false); // Close the delete popup
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (updateMode) {
@@ -85,15 +85,37 @@ const RescheduleCourse = () => {
       setUpdateMode(false); // Exit update mode
       setShowPopup(false); // Close the popup
     } else {
-      // Handle search operation here
-      const dummyData = {
-        instructorName: "John Doe",
-        courseName: selectedCourse,
-        date: courseDate,
-        time: selectedTime,
-      };
-
-      setSearchResults(dummyData);
+      // Handle search operation
+  
+      try {
+        const db = getDatabase();
+        const coursesRef = ref(db, "courses"); // Assuming "courses" is your database reference
+  
+        // Perform a query to find matching records based on user input
+        const snapshot = await get(coursesRef);
+  
+        if (snapshot.exists()) {
+          const coursesData = snapshot.val();
+          const matchingCourses = Object.values(coursesData).filter((course) => {
+            return (
+              course.selectedCategory === selectedCategory &&
+              course.selectedCourse === selectedCourse &&
+              course.courseDate === courseDate &&
+              course.selectedTimings.includes(selectedTime)
+            );
+          });
+  
+          if (matchingCourses.length > 0) {
+            setSearchResults(matchingCourses[0]); // Assuming you want to display the first matching course
+          } else {
+            setSearchResults(null);
+          }
+        } else {
+          setSearchResults(null);
+        }
+      } catch (error) {
+        console.error("Error searching in the database:", error);
+      }
     }
   };
 

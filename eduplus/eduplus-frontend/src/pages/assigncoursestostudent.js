@@ -40,7 +40,8 @@ const AssignCoursesToStudent = () => {
   ];
 
   const { Categories } = categoryData;
-
+  const [faculties, setFaculties] = useState([]);
+  const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
@@ -69,16 +70,17 @@ const AssignCoursesToStudent = () => {
 
   useEffect(() => {
     const database = getDatabase();
-    const studentRef = ref(database, "users/student");
+    const studentRef = ref(database, "child/");
 
     get(studentRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
           const studentData = snapshot.val();
-          const studentNames = Object.values(studentData).map(
-            (student) => `${student.firstname} ${student.lastname}`
-          );
-          setSelectedStudent(studentNames);
+          const students = Object.values(studentData).map((student) => ({
+            id: student.id, // replace with your actual user ID field
+            name: `${student.firstname} ${student.lastname}`,
+          }));
+          setStudents(students);
         }
       })
       .catch((error) => {
@@ -87,6 +89,25 @@ const AssignCoursesToStudent = () => {
   }, []);
 
   const studentList = [selectedStudent];
+  useEffect(() => {
+    const database = getDatabase();
+    const facultyRef = ref(database, "users/faculty");
+
+    get(facultyRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const facultyData = snapshot.val();
+          const faculties = Object.values(facultyData).map((faculty) => ({
+            id: faculty.id, // replace with your actual user ID field
+            name: `${faculty.firstname} ${faculty.lastname}`,
+          }));
+          setFaculties(faculties)
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching faculty names:", error);
+      });
+  }, []);
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
@@ -117,13 +138,8 @@ const AssignCoursesToStudent = () => {
 
   const handleFacultyChange = (faculty) => {
     setSelectedFaculty(faculty);
-    setAvailableTypes([]);     
-
-    setAvailableTypes(
-      Categories.find(
-        (category) => category.CategoryName === selectedCategory
-      )?.Courses.find((course) => course.CourseName === selectedCourse)?.FacultyTypes[faculty] || []
-    );
+   // Set available course types directly
+  setAvailableTypes(["Individual", "Group"]);
     setCourseType("");         
   };
 
@@ -188,9 +204,9 @@ const AssignCoursesToStudent = () => {
             required
           >
             <option value="">Select Student</option>
-            {studentList.map((student) => (
-              <option key={student} value={student}>
-                {student}
+            {students.map((student) => (
+              <option key={student.id} value={student.id}>
+                {student.name}
               </option>
             ))}
           </select>
@@ -247,9 +263,9 @@ const AssignCoursesToStudent = () => {
               required
             >
               <option value="">Select Faculty</option>
-              {availableFaculties.map((faculty) => (
-                <option key={faculty} value={faculty}>
-                  {faculty}
+              {faculties.map((faculty) => (
+                <option key={faculty.id} value={faculty.id}>
+                  {faculty.name}
                 </option>
               ))}
             </select>
