@@ -5,9 +5,8 @@ import countriesList from '../dummydata/countries';
 import { database } from '../firebase'
 import { getDatabase, ref, set, get } from "firebase/database";
 import { useAuth } from "../pages/authcontext";
-//import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { fetchUserProfileData } from "./firebaseFunctions"; // Import the function to fetch user data
+import { fetchUserProfileData } from "./firebaseFunctions"; // import the function to fetch user data
 
 const ChildRegistrationPage = () => {
   const navigate = useNavigate();
@@ -52,12 +51,11 @@ const ChildRegistrationPage = () => {
     // Trim leading and trailing spaces from the username
     const trimmedUsername = userID.trim();
 
-
     if (
       !firstname ||
       // !lastname ||
-      !password ||
       !trimmedUsername ||
+      !password ||
       !confirmPassword ||
       !userID ||
       !dob ||
@@ -74,15 +72,11 @@ const ChildRegistrationPage = () => {
     } else if (!isAgeValid(dob)) {
       setError("You must be at least 6 years old to register.");
     } else {
-      // Construct the email address using firstname
-      const constructedEmail = `${trimmedUsername}@eduplus.com`;
+      const constructedEmail = `${trimmedUsername}@eduplus.com`;  // Construct the email address using firstname
       if (await isUserAlreadyRegistered(constructedEmail)) {
         setError("This UserId is already taken, please choose another.");
       } else {
-        // Set the email field with the constructed email
-        //setEmail(constructedEmail);
-        // Continue with registration
-        registerUser(currentUser.uid, constructedEmail);
+        registerUser(currentUser.uid, constructedEmail); // set the email field with the constructed email
       }
     }
   };
@@ -100,14 +94,6 @@ const ChildRegistrationPage = () => {
     return age >= 6;
   };
 
-  /*
-  const isEmailAlreadyRegistered = async (emailToCheck) => {
-    const userRef = collection(database, "users");
-    const q = query(userRef, where("email", "==", userIDToCheck));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.size > 0;
-  };
- */
   const isUserAlreadyRegistered = async (emailToCheck) => {
     const database = getDatabase();
     const usersRef = ref(database, "users");
@@ -131,11 +117,7 @@ const ChildRegistrationPage = () => {
     const auth = getAuth();
     try {
       // Create a new user in Firebase Authentication
-      //setEmail(email);
-      console.log("OLD email value is :", email);
-      //console.log("NEW email value is :", emailId);
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      //const userRef = collection(database, "users");
       if (user) {
         const database = getDatabase();
         // Fetch the current count of children registered under the parent's node
@@ -143,14 +125,11 @@ const ChildRegistrationPage = () => {
         const parentSnapshot = await get(parentRef);
         const childCount = parentSnapshot.exists() ? Object.keys(parentSnapshot.val()).length : 0;
 
-        // Create a unique key for the new child (e.g., "child1", "child2")
-        //const childKey = `child${childCount + 1}`;
-
         // Set the child's name (using the first name) as the key under the parent's node
         const childName = firstname;
 
         ;
-        const usersRef = ref(database, "users/" + user.uid);
+        const usersRef = ref(database, "child/" + user.uid);
         const newUser = {
           role: "student",
           uid: user.uid,
