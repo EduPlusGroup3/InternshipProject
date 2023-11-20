@@ -5,14 +5,10 @@ import { useAuth } from "../pages/authcontext";
 import { getDatabase, ref, push, set, get } from "firebase/database";
 
 const MyClasses = (
-  { onClose, 
-    username, 
-    classesData, 
-    isParent, 
-    childNames = [], 
-    selectedChild, 
-    onChildChange}) => {
+  { username, isParent }) => {
+
   
+  const [selectedChild, setSelectedChild] = useState("");
   const [filteredAttendedClasses, setAttendedClasses] = useState([]);
   const { currentUser } = useAuth();
   const [userData, setUserData] = useState({
@@ -28,6 +24,11 @@ const MyClasses = (
     courses: {}
   });
 
+  const handleChildChange = (event) => {
+    setSelectedChild(event.target.value);
+  };
+
+
   useEffect(() => {
     if (currentUser) {
       const uid = currentUser.uid;
@@ -35,6 +36,11 @@ const MyClasses = (
         const data = await fetchUserProfileData(uid);
         if (data) {
           setUserData(data);
+          const {currentUser} = useAuth;
+          const userRole = currentUser? currentUser.userRole: null;
+          console.log(userRole)
+          
+  
         }
       };
       fetchData();
@@ -74,6 +80,7 @@ const MyClasses = (
 
   console.log("selectedChild---->", selectedChild);
   const selectedChild1 = "Deepak"
+  
 
   if(isParent)
   {
@@ -105,7 +112,7 @@ const MyClasses = (
           <div>
             <h2>Student Classes</h2>
             <label htmlFor="childDropdown">Select Child:</label>
-            <select id="childDropdown" value={selectedChild} onChange={onChildChange}>
+            <select id="childDropdown" value={selectedChild} onChange={handleChildChange}>
               {/* Use dummyChildNames instead of childNames */}
               {childNamesFromData.map((childName) => (
                 <option key={childName} value={childName}>
