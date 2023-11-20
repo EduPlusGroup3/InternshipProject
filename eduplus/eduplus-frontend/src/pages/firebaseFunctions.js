@@ -5,9 +5,25 @@ export const fetchUserProfileData = async (uid) => {
   const database = getDatabase();
   const userRef = ref(database, `users/${uid}`);
 
+  /*
+  //enable below logic once will have role here
+  let userRef ;
+  switch(selectedRole)
+  {
+    case "student" :
+      userRef = ref(database, `child/${uid}`);;
+      break;
+    case "faculty" :
+      userRef = ref(database, `users/faculty/${uid}`);;
+      break;
+    default:
+      userRef = ref(database, `users/${uid}`);;
+      break;      
+  }
+  */
+
   try {
     const userSnapshot = await get(userRef);
-
     if (userSnapshot.exists()) {
       const userData = userSnapshot.val();
       return {
@@ -17,6 +33,8 @@ export const fetchUserProfileData = async (uid) => {
         country: userData.country || "",
         region: userData.region || "",
         gender: userData.gender || "",
+        child: userData.child || {}, // Assuming child is an object
+        courseUids: userData.courseUids || {},  // Assuming courses is an object
       };
     } else {
       console.error("User data does not exist.");
