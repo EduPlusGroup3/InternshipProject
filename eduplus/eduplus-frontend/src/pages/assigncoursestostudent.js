@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import categoryData from "../dummydata/categoryData";
-import { getDatabase, ref, get } from "firebase/database";
+import { getDatabase, ref,push, set, get } from "firebase/database";
+import { v4 as uuidv4 } from 'uuid';
 
 const AssignCoursesToStudent = () => {
   const fetchTimeSlotsForGroup = (group) => {
@@ -59,6 +60,8 @@ const AssignCoursesToStudent = () => {
     "2023-11-18 02:30 PM",
     "2023-11-19 11:15 AM",
   ]);
+  const [isCourseAdded, setIsCourseAdded] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const groupsData = {
@@ -78,7 +81,9 @@ const AssignCoursesToStudent = () => {
           const studentData = snapshot.val();
           const students = Object.values(studentData).map((student) => ({
             id: student.id, // replace with your actual user ID field
-            name: `${student.firstname} ${student.lastname}`,
+            studentUserName: student.userName,
+            studentEmail: student.email,
+            studentUid : student.uid
           }));
           setStudents(students);
         }
@@ -88,7 +93,6 @@ const AssignCoursesToStudent = () => {
       });
   }, []);
 
-  const studentList = [selectedStudent];
   useEffect(() => {
     const database = getDatabase();
     const facultyRef = ref(database, "users/faculty");
@@ -99,7 +103,9 @@ const AssignCoursesToStudent = () => {
           const facultyData = snapshot.val();
           const faculties = Object.values(facultyData).map((faculty) => ({
             id: faculty.id, // replace with your actual user ID field
-            name: `${faculty.firstname} ${faculty.lastname}`,
+            //facultyName: `${faculty.firstname} ${faculty.lastname}`,
+            facultyEmail: faculty.email,
+            facultyUid : faculty.uid
           }));
           setFaculties(faculties)
         }
@@ -175,21 +181,77 @@ const AssignCoursesToStudent = () => {
   };  
   
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log("Submitting data:", {
-      student: studentList,
-      category: selectedCategory,
-      course: selectedCourse,
-      date: courseDate,
-      times: selectedTime,
-      faculty: selectedFaculty,
-      type: courseType,
-      group: selectedGroup,
-    });
-    alert("Courses Assigned");
+    try{
+      const database = getDatabase();
+      const courseUid = uuidv4();
+      const coursesRef = ref(database, 'courses/students/' + courseUid);
+  
+      const studentEmail = `${selectedStudent}@eduplus.com`;
+      const studentUid = findStudentByEmail(studentEmail);
+      const facultyUid = findFacultyByEmail(selectedFaculty);
+
+      // Fetch the existing student data using studentUid
+      const existingStudentSnapshot = await get(ref(database, `child/${studentUid}`));
+      const existingStudentData = existingStudentSnapshot.val();
+      //console.log("existingStudentData-->", existingStudentData);
+
+      const courseUids = existingStudentData.courseUids || [];
+      // Update the student record with the new courseUid
+      const updatedStudentData = {
+        ...existingStudentData,
+        courseUids: [courseUid, ...courseUids],
+      };
+      //console.log("updatedStudentData-->", updatedStudentData);
+      await set(ref(database, `child/${studentUid}`), updatedStudentData);
+
+      /*
+      // Fetch the existing faculty data using studentUid
+      const existingFacultySnapshot = await get(ref(database, `users/faculty/${facultyUid}`));
+      const existingFacultyData = existingFacultySnapshot.val();
+
+      let courseUids = existingFacultyData.courseUids || [];
+      // Update the student record with the new courseUid
+      const updatedFacultyData = {
+        ...existingFacultyData,
+        courseUid: courseUid,
+      };
+      await set(ref(database, `users/faculty/${facultyUid}`), updatedFacultyData);
+      */
+
+      const courseData = {
+        uid: courseUid,
+        student: selectedStudent,
+        category: selectedCategory,
+        course: selectedCourse,
+        times: selectedTime,
+        faculty: selectedFaculty,
+        type: courseType,
+        studentUid : studentUid,
+        facultyUid : facultyUid
+      };
+      await set(coursesRef, courseData);
+      setIsCourseAdded(true);
+      alert("Courses Assigned to Student");
+    }catch (error) {
+      setError("Error Occured while adding course to student. Please try again later.");
+      console.error("Error adding course:", error);
+    }
   };
 
+  // Function to find a student UID by email
+  const findStudentByEmail = (email) => {
+  const foundStudent = students.find((student) => student.studentEmail === email);
+  return foundStudent ?  foundStudent.studentUid : null;
+  };
+
+  // Function to find a faculty UID by email
+  const findFacultyByEmail = (email) => {
+  const foundFaculty = faculties.find((faculty) => faculty.facultyEmail === email);
+  return foundFaculty ?  foundFaculty.facultyUid : null;
+   };
+  
   return (
     <div className="user-profile">
       <h2>Assign Courses to Student</h2>
@@ -206,7 +268,7 @@ const AssignCoursesToStudent = () => {
             <option value="">Select Student</option>
             {students.map((student) => (
               <option key={student.id} value={student.id}>
-                {student.name}
+                {student.studentUserName}
               </option>
             ))}
           </select>
@@ -265,7 +327,7 @@ const AssignCoursesToStudent = () => {
               <option value="">Select Faculty</option>
               {faculties.map((faculty) => (
                 <option key={faculty.id} value={faculty.id}>
-                  {faculty.name}
+                  {faculty.facultyEmail}
                 </option>
               ))}
             </select>

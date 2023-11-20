@@ -17,6 +17,7 @@ const ChildRegistrationPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [userID, setUserId] = useState("");
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [dob, setDOB] = useState("");
   const [grade, setGrade] = useState("");
@@ -26,7 +27,7 @@ const ChildRegistrationPage = () => {
   const [gender, setGender] = useState("");
   const [error, setError] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
-  const { username: loggedInUserEmail } = useAuth();
+  //const { username: loggedInUserEmail } = useAuth();
 
   useEffect(() => {
     // Use the countriesList from the imported file
@@ -46,10 +47,12 @@ const ChildRegistrationPage = () => {
     }
   }, [currentUser]);
 
+
   const handleRegistration = async (e) => {
     e.preventDefault();
     // Trim leading and trailing spaces from the username
     const trimmedUsername = userID.trim();
+    setUserName(trimmedUsername);
 
     if (
       !firstname ||
@@ -67,7 +70,7 @@ const ChildRegistrationPage = () => {
       setError("Kinldy fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
-    } else if (trimmedUsername.length > 8) {
+    } else if (userName.length > 8) {
       setError("Username must be at most 8 characters long");
     } else if (!isAgeValid(dob)) {
       setError("You must be at least 6 years old to register.");
@@ -136,12 +139,12 @@ const ChildRegistrationPage = () => {
           firstname,
           lastname,
           email,
+          userName : userName,
           dob,
           grade,
           country,
           region,
           gender,
-          password,
           parentUid: currentUserUid, // Store the parent's UID
         };
         await set(usersRef, newUser);
