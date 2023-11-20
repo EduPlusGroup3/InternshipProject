@@ -3,7 +3,7 @@ import "react-time-picker/dist/TimePicker.css";
 import "../assests/styles/registrationpagestyles.css";
 import categoryData from "../dummydata/categoryData";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { getDatabase, ref, set, get } from "firebase/database";
+import { getDatabase, ref, set, get,child,update } from "firebase/database";
 import { useAuth } from "../pages/authcontext";
 import { fetchUserProfileData } from "./firebaseFunctions";
 
@@ -56,10 +56,21 @@ const RescheduleCourse = () => {
     setShowConfirmation(true); // Open the delete confirmation popup
   };
 
-  const handleConfirmDelete = () => {
-    // Handle delete operation here
-    alert("Record deleted successfully!");
-    setShowConfirmation(false); // Close the delete popup
+  const handleConfirmDelete = async () => {
+    const db = getDatabase();
+    const coursesRef = ref(db, "/courses");
+  
+    try {
+      // Delete the specific course from the database
+      await set(child(coursesRef, searchResults.id), null);
+  
+      alert("Record deleted successfully!");
+      setShowConfirmation(false); // Close the delete popup
+      setSearchResults(null); // Clear search results after deletion
+    } catch (error) {
+      console.error("Error deleting the database:", error);
+      // Handle the error as needed
+    }
   };
 
   const handleCancelDelete = () => {
@@ -69,44 +80,45 @@ const RescheduleCourse = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const db = getDatabase();
+    const coursesRef = ref(db, "/courses");
     if (updateMode) {
-      // Handle update operation here, send modifiedDate and modifiedTime to the database
-      const updatedData = {
-        instructorName: "John Doe",
-        courseName: selectedCourse,
-        date: modifiedDate,
-        time: modifiedTime,
-      };
+      try {
+        // Construct updated data
+        const updatedData = {
+          courseDate: modifiedDate,
+          selectedTimings: modifiedTime,
+        };
 
-      // Perform the database update operation with updatedData
-      // Example: updateDataInDatabase(updatedData);
+       // Update the specific course in the database
+      await update(child(coursesRef, searchResults.id), updatedData);
 
-      alert("Record updated successfully!");
-      setUpdateMode(false); // Exit update mode
-      setShowPopup(false); // Close the popup
+        alert("Record updated successfully!");
+        setUpdateMode(false); // Exit update mode
+        setShowPopup(false); // Close the popup
+      } catch (error) {
+        console.error("Error updating the database:", error);
+        // Handle the error as needed
+      }
     } else {
       // Handle search operation
-  
       try {
-        const db = getDatabase();
-        const coursesRef = ref(db, "courses"); // Assuming "courses" is your database reference
-  
-        // Perform a query to find matching records based on user input
         const snapshot = await get(coursesRef);
-  
+
         if (snapshot.exists()) {
           const coursesData = snapshot.val();
-          const matchingCourses = Object.values(coursesData).filter((course) => {
+          const matchingCourses = Object.entries(coursesData).filter(([courseId, course]) => {
             return (
               course.selectedCategory === selectedCategory &&
               course.selectedCourse === selectedCourse &&
               course.courseDate === courseDate &&
-              course.selectedTimings.includes(selectedTime)
+              course.selectedTimings === selectedTime
             );
           });
-  
+
           if (matchingCourses.length > 0) {
-            setSearchResults(matchingCourses[0]); // Assuming you want to display the first matching course
+            const [courseId, course] = matchingCourses[0];
+            setSearchResults({ id: courseId, ...course });
           } else {
             setSearchResults(null);
           }
@@ -118,6 +130,7 @@ const RescheduleCourse = () => {
       }
     }
   };
+  
 
   return (
     
@@ -206,13 +219,13 @@ const RescheduleCourse = () => {
         
               </form>
 
-      {searchResults && (
+      {searchResults ? (
         <div className="search-results">
           <h3>Search Results:</h3>
           <p style={{ display: "flex", justifyContent: "space-between" }}>
             <span>
-              {searchResults.instructorName} {searchResults.courseName}{" "}
-              {searchResults.date} {searchResults.time}
+            {searchResults.selectedFaculty} {searchResults.selectedCourse}{" "}
+        {searchResults.courseDate} {searchResults.selectedTimings}
             </span>
             <span>
               <span
@@ -231,7 +244,7 @@ const RescheduleCourse = () => {
             </span>
           </p>
         </div>
-      )}
+      ):(<p>No result found</p>)}
 
       {showPopup && (
         <div className="popup confirmation-popup">
