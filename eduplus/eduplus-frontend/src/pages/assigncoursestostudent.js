@@ -195,25 +195,30 @@ const AssignCoursesToStudent = () => {
       // Fetch the existing student data using studentUid
       const existingStudentSnapshot = await get(ref(database, `child/${studentUid}`));
       const existingStudentData = existingStudentSnapshot.val();
+      console.log("existingStudentData-->", existingStudentData);
 
+      let courseUids = existingStudentData.courseUids || [];
       // Update the student record with the new courseUid
       const updatedStudentData = {
         ...existingStudentData,
-        courseUid: courseUid,
+        courseUids: [courseUid, ...courseUids],
       };
+      console.log("updatedStudentData-->", updatedStudentData);
       await set(ref(database, `child/${studentUid}`), updatedStudentData);
 
-
+      /*
       // Fetch the existing faculty data using studentUid
       const existingFacultySnapshot = await get(ref(database, `users/faculty/${facultyUid}`));
       const existingFacultyData = existingFacultySnapshot.val();
 
+      let courseUids = existingFacultyData.courseUids || [];
       // Update the student record with the new courseUid
       const updatedFacultyData = {
         ...existingFacultyData,
         courseUid: courseUid,
       };
       await set(ref(database, `users/faculty/${facultyUid}`), updatedFacultyData);
+      */
 
       const courseData = {
         uid: courseUid,
