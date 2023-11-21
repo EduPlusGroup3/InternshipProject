@@ -3,6 +3,7 @@ import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
 import { useNavigate,Link } from "react-router-dom";
 import MyClasses from "./myclasses";
+import FacultyClasses from "./facultyclasses";
 import EnquiryModal from "./enquiry"; 
 import ClassesPreferred from "./classespreferred";
 import ForgotPasswordModal from "./forgotpassword";
@@ -27,6 +28,7 @@ const UserHomePage = () => {
   const [ismyClassesOpen, setIsMyClassesOpen] = useState(false);
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false);
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+  const [isFacultyClassesOpen, setIsFacultyClassesOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
 
   const [uid, setUid] = useState(null);
@@ -38,6 +40,7 @@ const UserHomePage = () => {
     setIsEnquiryOpen(false);
     setIsMyClassesOpen(false);
     setIsAttendanceOpen(false);
+    setIsFacultyClassesOpen(false);
   }, []);
 
   const openLoginModal = () => {
@@ -96,24 +99,28 @@ const UserHomePage = () => {
       setIsEnquiryOpen(false);
       setIsMyClassesOpen(false);
       setIsAttendanceOpen(false)
+      setIsFacultyClassesOpen(false)
     } else if (link === "classesPreferred") {
       setIsClassesPreferOpen(true);
       setIsProfileOpen(false);
       setIsEnquiryOpen(false);
       setIsMyClassesOpen(false);
       setIsAttendanceOpen(false)
+      setIsFacultyClassesOpen(false)
     } else if (link === "myclasses") {
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
       setIsEnquiryOpen(false);
       setIsMyClassesOpen(true);
       setIsAttendanceOpen(false)
+      setIsFacultyClassesOpen(false)
     } else if (link === "enquiry") {
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
       setIsEnquiryOpen(true);
       setIsMyClassesOpen(false);
       setIsAttendanceOpen(false)
+      setIsFacultyClassesOpen(false)
     } 
     else if (link === "attendance") {
       setIsClassesPreferOpen(false);
@@ -121,6 +128,14 @@ const UserHomePage = () => {
       setIsEnquiryOpen(false);
       setIsMyClassesOpen(false);
       setIsAttendanceOpen(true)
+      setIsFacultyClassesOpen(false)
+    }else if (link === "facultyClasses") {
+      setIsClassesPreferOpen(false);
+      setIsProfileOpen(false);
+      setIsEnquiryOpen(false);
+      setIsMyClassesOpen(false);
+      setIsAttendanceOpen(false)
+      setIsFacultyClassesOpen(true)
     } else {
       setActiveLink(link);
       setOpenModal(link);
@@ -148,6 +163,10 @@ const UserHomePage = () => {
     setIsAttendanceOpen(false);
   };
 
+  const closeFacultyClassesModal = () => {
+    setIsFacultyClassesOpen(false);
+  };
+
   const isParent = currentUser && currentUser.role === 'parent';
   const isAdmin = currentUser && currentUser.role === 'admin';
   const isInstructor = currentUser && currentUser.role === 'instructor';
@@ -158,15 +177,20 @@ const UserHomePage = () => {
   { 
     id: "classesPreferred", 
     label: isParent ? "Available Courses" : "Classes Preferred",
-    // Conditionally include the "classesPreferred" item based on the user's role
     hidden: isInstructor,
   },
-  { id: "myclasses", label: isParent ? "Student Classes" : "My Classes" },
+  { id: "facultyClasses", label: "Faculty Classes",
+    hidden:isAdmin||isParent||isStudent
+  },
+  { id: "myclasses", label: isParent ? "Student Classes" : "My Classes",
+    hidden: isInstructor
+  },
   {
     id: "attendance", label:"Attendance",
     hidden: isParent || isStudent,
   },
   { id: "enquiry", label: "Enquiry" },
+ 
 ];
 
   const handleLogin = (userData) => {
@@ -258,6 +282,9 @@ const UserHomePage = () => {
           )}         
           {isAttendanceOpen && (
             <Attendance onClose={closeAttendanceModal} username={username} classesData={dummyClassesData} />
+          )}
+          {isFacultyClassesOpen && (
+            <FacultyClasses onClose={closeFacultyClassesModal} username={username} classesData={dummyClassesData} />
           )}
         </section>
       </main>

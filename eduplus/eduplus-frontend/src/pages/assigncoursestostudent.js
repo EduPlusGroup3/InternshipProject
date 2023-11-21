@@ -234,10 +234,21 @@ const AssignCoursesToStudent = () => {
       await set(coursesRef, courseData);
       setIsCourseAdded(true);
       alert("Courses Assigned to Student");
+      resetForm();
     }catch (error) {
       setError("Error Occured while adding course to student. Please try again later.");
       console.error("Error adding course:", error);
     }
+  };
+
+  const resetForm = () => {
+    setSelectedStudent(""); 
+    setSelectedCategory("");
+    setSelectedCourse("");
+    setSelectedTime(""); 
+    setSelectedFaculty(""); 
+    setCourseType(""); 
+   
   };
 
   // Function to find a student UID by email

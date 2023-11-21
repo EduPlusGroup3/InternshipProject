@@ -17,9 +17,7 @@ const UpdateFaculty = () => {
   const [gender, setGender] = useState("");
   const [country, setCountry] = useState("");
   const [dob, setDOB] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [mobile, setMobile] = useState("");  
   const [degree, setDegree] = useState("");
   const [error, setError] = useState("");
   const [countries, setCountries] = useState([]);
@@ -50,21 +48,18 @@ const UpdateFaculty = () => {
     const database = getDatabase();
 
     if (
-
+      !userId ||
       !firstname ||
       !lastname ||
       !gender ||
       !country ||
       !dob ||
       !mobile ||
-      !password ||
-      !confirmPassword ||
+      
       !degree
     ) {
       setError("All fields are required");
-    } else if (password !== confirmPassword) {
-      setError("Passwords do not match");
-    } else {
+    }  else {
       setError("");
       const trimmedFirstname = firstname.trim().toLowerCase();
       const constructedEmail = `${trimmedFirstname}@eduplus.com`;
@@ -164,7 +159,7 @@ const UpdateFaculty = () => {
           <h2>Update Faculty</h2>
           <form onSubmit={handleRegistration}>
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">Email:<span className="asteriskColor">*</span></label>
             <div className="search-input">
               <input
                 type="text"
@@ -251,32 +246,8 @@ const UpdateFaculty = () => {
                 onChange={(e) => setDOB(e.target.value)}
                 required
               />
-            </div>
-                      
-            <div className="form-group">
-              <label htmlFor="password">Password<span className="asteriskColor">*</span></label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password<span className="asteriskColor">*</span></label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
+            </div>                      
+         
             <div className="form-group">
               <label htmlFor="mobile">Mobile:</label>
               <input

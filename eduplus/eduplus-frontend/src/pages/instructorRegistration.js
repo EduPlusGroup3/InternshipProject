@@ -50,7 +50,7 @@ const AddFaculty = () => {
     const database = getDatabase();
 
     if (
-   
+      !userId ||
       !firstname ||
       !lastname ||
       !gender ||
@@ -117,7 +117,7 @@ const AddFaculty = () => {
           <h2>Instructor Registration</h2>
           <form onSubmit={handleRegistration}>
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">Email:<span className="asteriskColor">*</span></label>
             <div>
               <input
                 type="text"

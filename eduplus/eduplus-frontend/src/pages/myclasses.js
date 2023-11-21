@@ -95,6 +95,7 @@ const MyClasses = (
             <h2>Student Classes</h2>
             <label htmlFor="childDropdown">Select Child:</label>
             <select id="childDropdown" value={selectedChild} onChange={handleChildChange}>
+              <option value="">Select Child</option>
               {/* Use dummyChildNames instead of childNames */}
               {childNamesFromData.map((childName) => (
                 <option key={childName} value={childName}>
@@ -107,16 +108,35 @@ const MyClasses = (
           <p className="username">Username: {username}</p>
         )}
 
-        <div style={{ marginTop: "10px" }} className="class-box attended-box">
+        <div style={{ marginTop: "10px" }} className={`class-box attended-box ${filteredAttendedClasses.length > 0 ? 'has-data' : 'no-data'}`}>
           <h3>Enrolled Classes:</h3>
-          <ul>
-            {filteredAttendedClasses.map((attendedClass) => (
-              <li key={attendedClass.id}>
-                {attendedClass.category} - {attendedClass.course} - {attendedClass.times} - {attendedClass.facultyEmail}
-              </li>
-            ))}
-          </ul>
+          {filteredAttendedClasses.length > 0 ? (
+            <table style={{ borderCollapse: "collapse", width: "100%" }}>
+              <thead>
+                <tr>
+                  <th>Course Category</th>
+                  <th>Course Name</th>
+                  <th>Date/Time</th>
+                  <th>Faculty Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredAttendedClasses.map((attendedClass) => (
+                  <tr key={attendedClass.id}>
+                    <td>{attendedClass.category}</td>
+                    <td>{attendedClass.course}</td>
+                    <td>{attendedClass.times}</td>
+                    <td>{attendedClass.facultyEmail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No enrolled classes available.</p>
+          )}
         </div>
+
+
 
         {/* <div className="class-box missed-box">
           <h3>Classes Missed:</h3>
