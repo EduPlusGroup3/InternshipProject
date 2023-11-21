@@ -53,11 +53,12 @@ const ChildRegistrationPage = () => {
     // Trim leading and trailing spaces from the username
     const trimmedUsername = userID.trim();
     setUserName(trimmedUsername);
+    setUserId(trimmedUsername)
 
     if (
       !firstname ||
       // !lastname ||
-      !trimmedUsername ||
+      //!trimmedUsername ||
       !password ||
       !confirmPassword ||
       !userID ||
@@ -70,12 +71,12 @@ const ChildRegistrationPage = () => {
       setError("Kinldy fill all the mandatory fields!");
     } else if (password !== confirmPassword) {
       setError("Passwords do not match");
-    } else if (userName.length > 8) {
+    } else if (userID.length > 8) {
       setError("Username must be at most 8 characters long");
     } else if (!isAgeValid(dob)) {
       setError("You must be at least 6 years old to register.");
     } else {
-      const constructedEmail = `${trimmedUsername}@eduplus.com`;  // Construct the email address using firstname
+      const constructedEmail = `${userID}@eduplus.com`;  // Construct the email address using firstname
       if (await isUserAlreadyRegistered(constructedEmail)) {
         setError("This UserId is already taken, please choose another.");
       } else {
@@ -139,7 +140,8 @@ const ChildRegistrationPage = () => {
           firstname,
           lastname,
           email,
-          userName : userName,
+          //userName : userName,
+          userID,
           dob,
           grade,
           country,

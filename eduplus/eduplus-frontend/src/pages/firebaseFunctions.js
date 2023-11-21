@@ -13,7 +13,7 @@ export const fetchUserProfileData = async (uid, role) => {
     case "student" :
       userRef = ref(database, `child/${uid}`);
       break;
-    case "faculty" :
+    case "instructor" :
       userRef = ref(database, `users/faculty/${uid}`);
       break;
     default:
