@@ -6,8 +6,6 @@ import { getDatabase, ref, push, set, get } from "firebase/database";
 
 const MyClasses = (
   { username, isParent }) => {
-
-  
   const [selectedChild, setSelectedChild] = useState("");
   const [filteredAttendedClasses, setAttendedClasses] = useState([]);
   const { currentUser } = useAuth();
@@ -39,8 +37,6 @@ const MyClasses = (
           const {currentUser} = useAuth;
           const userRole = currentUser? currentUser.userRole: null;
           console.log(userRole)
-          
-  
         }
       };
       fetchData();
@@ -78,15 +74,11 @@ const MyClasses = (
       }
     }
 
-  console.log("selectedChild---->", selectedChild);
-  const selectedChild1 = "Deepak"
-  
-
   if(isParent)
   {
-    if (userData.child.hasOwnProperty(selectedChild1)) 
+    if (userData.child.hasOwnProperty(selectedChild)) 
     {
-      const childUid = userData.child[selectedChild1];
+      const childUid = userData.child[selectedChild];
       fetchData(childUid);
     }
   }
@@ -94,17 +86,7 @@ const MyClasses = (
   {
     fetchData(currentUser.uid);
   }
-  /*
-  // Filter attended classes for the selected child
-  const filteredAttendedClasses = isParent
-    ? allClasses.filter((attendedClass) => attendedClass.childName === selectedChild1)
-    : allClasses;
 
-  // Filter upcoming classes for the selected child
-  const filteredUpcomingClasses = isParent
-    ? classesData.upcoming.filter((upcomingClass) => upcomingClass.childName === selectedChild)
-    : classesData.upcoming;
-  */
   return (
     <div className="user-profile">
       <div className="profile-content">

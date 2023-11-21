@@ -45,7 +45,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
         case "student" :
           userRole = await getStudentRoleFromDatabase(user.uid);
           break;
-        case "faculty" :
+        case "instructor" :
           userRole = await getFacultyRoleFromDatabase(user.uid);
           break;
         default:

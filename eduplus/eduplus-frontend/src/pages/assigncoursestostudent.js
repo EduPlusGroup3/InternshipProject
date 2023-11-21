@@ -81,7 +81,7 @@ const AssignCoursesToStudent = () => {
           const studentData = snapshot.val();
           const students = Object.values(studentData).map((student) => ({
             id: student.id, // replace with your actual user ID field
-            studentUserName: student.userName,
+            studentUserName: student.userID,
             studentEmail: student.email,
             studentUid : student.uid
           }));
