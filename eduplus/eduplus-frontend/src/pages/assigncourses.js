@@ -106,10 +106,20 @@ const AssignCourses = () => {
       const newCourseRef = await push(coursesRef);
       await set(newCourseRef, courseData);
       alert("Courses Assigned");
+      resetForm();
     } catch (error) {
       console.error("Error assigning courses:", error);
       alert("An error occurred while assigning courses. Please try again.");
     }
+  };
+
+  const resetForm = () => {
+    setSelectedFaculty("");
+    setSelectedCategory("");
+    setSelectedCourse("");
+    setCourseDate("");
+    setSelectedTime("");
+    setCourseDescription("");
   };
 
   // Trigger the asynchronous operation

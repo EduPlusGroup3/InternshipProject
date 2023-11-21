@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
     // Save to localStorage
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("username", user.username);
-    localStorage.setItem("currentUser", JSON.stringify({ ...user, role: user.role }));
+    localStorage.setItem("currentUser", JSON.stringify({ ...user, role: user.roles }));
   };
 
   const logout = () => {
