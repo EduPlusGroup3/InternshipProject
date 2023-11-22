@@ -57,7 +57,7 @@ const HomePage = () => {
         {isLoggedIn ? (
             <>
           {isAdmin ? (
-                <Link to="/adminhp" className="login-button">Hello {username}}</Link>
+                <Link to="/adminhp" className="login-button">Hello {username}</Link>
               ) : (
                 <Link to="/userhp" className="login-button">Hello {username}</Link>
               )}
