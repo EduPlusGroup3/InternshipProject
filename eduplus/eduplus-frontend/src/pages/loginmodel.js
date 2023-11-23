@@ -47,6 +47,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
           break;
         case "instructor" :
           userRole = await getFacultyRoleFromDatabase(user.uid);
+          console.log("userRole",userRole);
           break;
         default:
           userRole = await getUserRoleFromDatabase(user.uid);
@@ -92,8 +93,10 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
     try {
       const userRoleSnapshot = await get(userRoleRef);
       if (userRoleSnapshot.exists()) {
+        console.log("found");
         return userRoleSnapshot.val();
       }
+      console.log("not found");
       return null; // User role not found
     } catch (error) {
       setError("Error getting user role from database:", error);

@@ -9,13 +9,14 @@ export const fetchUserProfileData = async (uid, role) => {
 
   
   //enable below logic once will have role here
+  console.log("role---->", role);
   let userRef ;
   switch(role)
   {
     case "student" :
       userRef = ref(database, `child/${uid}`);;
       break;
-    case "faculty" :
+    case "instructor" :
       userRef = ref(database, `users/faculty/${uid}`);;
       break;
     default:

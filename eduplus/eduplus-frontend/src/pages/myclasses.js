@@ -65,7 +65,7 @@ const MyClasses = (
                 times: courseDetail.times,
                 facultyEmail: courseDetail.faculty,
                 childName : courseDetail.student
-              };;
+              };
               classes.push(classDetail);
             }  
             setAttendedClasses(classes);
