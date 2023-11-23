@@ -24,6 +24,7 @@ const AssignCourses = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [availableGroups, setAvailableGroups] = useState(["Group 1", "Group 2"]);
   const [groupsWithStudents, setGroupsWithStudents] = useState({});
+  const [selectedFacultyUid, setSelectedFacultyUid] = useState("");
 
 
 
@@ -38,6 +39,7 @@ const AssignCourses = () => {
           const faculties = Object.values(facultyData).map((faculty) => ({
             id: faculty.id, // replace with your actual user ID field
             name: `${faculty.firstname} ${faculty.lastname}`,
+            facultyUid : faculty.uid
           }));
           setFaculties(faculties)
         }
@@ -85,27 +87,50 @@ const AssignCourses = () => {
       setSelectedGroup(group);    
   };
 
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const database = getDatabase();
-    const coursesRef = ref(database, "courses");
+  const handleFacultyChange = (faculty) => {
+    const selectedFacultyData = faculties.find((f) => f.name === faculty);
+    setSelectedFaculty(faculty);
+    setSelectedFacultyUid(selectedFacultyData?.facultyUid || "");
+  };
   
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    const uid = uuidv4(); // Generate a UUID for the course
+    const database = getDatabase();
+    const coursesRef = ref(database, "courses/" + uid );
+         
+    // Fetch the existing faculty data using studentUid
+    
+    const existingFacultySnapshot = await get(ref(database, `users/faculty/${selectedFacultyUid}`));
+    const existingFacultyData = existingFacultySnapshot.val();
+
+    const facultyCourseUids = existingFacultyData.courseUids || [];
+    // Update the student record with the new courseUid
+    const updatedFacultyData = {
+      ...existingFacultyData,
+      courseUids: [uid, ...facultyCourseUids],
+    };
+    await set(ref(database, `users/faculty/${selectedFacultyUid}`), updatedFacultyData);
+      
     const courseData = {
-      uid: uuidv4(), // Generate a UUID for the course
+      //uid: uuidv4(), // Generate a UUID for the course
+      uid : uid,
       selectedFaculty: selectedFaculty,
       selectedCategory: selectedCategory,
       selectedCourse: selectedCourse,
       courseDate: courseDate,
       selectedTimings: selectedTime,
       courseDescription: courseDescription,
+      courseType: courseType,
+      selectedGroup: selectedGroup
     };
-     // Perform asynchronous operation outside the event handler
+    
   const saveCourseData = async () => {
     try {
-      const newCourseRef = await push(coursesRef);
-      await set(newCourseRef, courseData);
-      alert("Courses Assigned");
+      //const newCourseRef = await push(coursesRef);
+      //await set(newCourseRef, courseData);
+      await set(coursesRef, courseData);
+      alert("Courses Assigned to Faculty");
       resetForm();
     } catch (error) {
       console.error("Error assigning courses:", error);
@@ -148,7 +173,8 @@ const AssignCourses = () => {
             id="faculty"
             name="faculty"
             value={selectedFaculty}
-            onChange={(e) => setSelectedFaculty(e.target.value)}
+            //onChange={(e) => setSelectedFaculty(e.target.value)}
+            onChange={(e) => handleFacultyChange (e.target.value)}
             required
           >
             <option value="">Select Faculty</option>
