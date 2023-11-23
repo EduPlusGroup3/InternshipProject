@@ -157,11 +157,15 @@ const AssignCoursesToStudent = () => {
     setCourseType(type);
     setSelectedGroup("");    
     if (type === "Individual") {
+
+      const timeSlots = fetchTimeSlots(selectedFaculty, type);
+      setDummyTimeSlots(timeSlots);
+      /*
       setDummyTimeSlots([
         "2023-11-20 09:00 AM",
         "2023-11-21 03:45 PM",
         "2023-11-22 01:30 PM",
-      ]);
+      ]);*/
     }
   };
 
@@ -170,11 +174,12 @@ const AssignCoursesToStudent = () => {
       console.log("Selected Group:", group);
   
       setSelectedGroup(group);
-  
-      const groupTimeSlots = fetchTimeSlotsForGroup(group);
-      console.log("Group Time Slots:", groupTimeSlots);
-  
-      setDummyTimeSlots(groupTimeSlots);
+      
+      const timeSlots = fetchTimeSlots(selectedFaculty, "Group");
+      setDummyTimeSlots(timeSlots);
+      //const groupTimeSlots = fetchTimeSlotsForGroup(group);
+      //console.log("Group Time Slots:", groupTimeSlots); 
+      //setDummyTimeSlots(groupTimeSlots);
       console.log("Selected Time:", selectedTime);
       setSelectedTime([]);
     } else {
@@ -298,6 +303,14 @@ const AssignCoursesToStudent = () => {
   setCourseTiming(courseTimeDetail);
   return matchingFaculties; 
 };
+
+  const fetchTimeSlots = (email, courseType) => {
+    const matchingCourses = courseTiming
+    .filter((course) => course.email === email && course.courseType === courseType)
+    .map((matchingCourse) => matchingCourse.timeSlot);
+
+  return matchingCourses;
+  };
 
   return (
     <div className="user-profile">
