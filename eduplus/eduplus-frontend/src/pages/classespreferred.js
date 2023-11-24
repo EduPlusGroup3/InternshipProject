@@ -4,6 +4,9 @@ import "../assests/styles/cards.css";
 import image2 from "../assests/images/image2.jpg";
 import image3 from "../assests/images/image3.jpg";
 import image4 from "../assests/images/image4.jpg";
+import "../assests/styles/VideoCarousel.css";
+import VideoCarousel from "../components/VideoCarousel";
+
 
 
 const ClassesPreferred = ({ onClose, username , isParent}) => {
@@ -19,7 +22,7 @@ const ClassesPreferred = ({ onClose, username , isParent}) => {
         )}
         <p>Username: {username}</p>
 
-        
+        <VideoCarousel/>
       <div className='cards'>
       <h1>Check out these Courses!</h1>
       <div className='cards__container'>
