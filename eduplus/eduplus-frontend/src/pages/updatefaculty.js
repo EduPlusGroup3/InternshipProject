@@ -107,6 +107,7 @@ const UpdateFaculty = () => {
   const handleSearchEmail = async () => {
     if (userId) {
       const trimmedFirstname = userId.trim().toLowerCase();
+      console.log(trimmedFirstname)
       const database = getDatabase();
       const usersRef = ref(database, "users/faculty");
 
@@ -115,7 +116,7 @@ const UpdateFaculty = () => {
         let foundUser = null; // Variable to store the found user
         userSnapshot.forEach((userSnapshot) => {
           const userData = userSnapshot.val();
-          if (userData.email === `${trimmedFirstname}@eduplus.com`) {
+          if (userData.email === `${trimmedFirstname}`) {
             setEmail(userData.email);
             setUserData(userData);
             setFirstname(userData.firstname);
