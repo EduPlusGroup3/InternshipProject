@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth,sendPasswordResetEmail } from "firebase/auth";
 import { getDatabase } from 'firebase/database';
 
 
@@ -23,5 +23,5 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app); // Use getDatabase for Realtime Database
 
-export { database, auth, app };
+export { database, auth, app, sendPasswordResetEmail };
 
