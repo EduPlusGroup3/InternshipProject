@@ -2,27 +2,28 @@ import { getDatabase, ref, get } from "firebase/database";
 import { useAuth } from "./authcontext";
 
 // Function to fetch user profile data from Firebase
-export const fetchUserProfileData = async (uid) => {
+export const fetchUserProfileData = async (uid, role) => {
   const database = getDatabase();
-  const userRef = ref(database, `users/${uid}`);
+  //const userRef = ref(database, `users/${uid}`);
   
 
-  /*
+  
   //enable below logic once will have role here
+  console.log("role---->", role);
   let userRef ;
-  switch(selectedRole)
+  switch(role)
   {
     case "student" :
       userRef = ref(database, `child/${uid}`);;
       break;
-    case "faculty" :
+    case "instructor" :
       userRef = ref(database, `users/faculty/${uid}`);;
       break;
     default:
       userRef = ref(database, `users/${uid}`);;
       break;      
   }
-  */
+  
 
   try {
     const userSnapshot = await get(userRef);

@@ -50,7 +50,7 @@ const AddFaculty = () => {
     const database = getDatabase();
 
     if (
-      !userId ||
+      !email ||
       !firstname ||
       !lastname ||
       !gender ||
@@ -66,9 +66,9 @@ const AddFaculty = () => {
       setError("Passwords do not match");
     } else {
       setError("");
-      const trimmedFirstname = firstname.trim().toLowerCase();
-      const constructedEmail = `${trimmedFirstname}@eduplus.com`;
-      registerFaculty(constructedEmail);
+      //const trimmedFirstname = firstname.trim().toLowerCase();
+      //const constructedEmail = `${trimmedFirstname}@eduplus.com`;
+      registerFaculty(email);
     }
   };
 
@@ -124,8 +124,11 @@ const AddFaculty = () => {
                 id="email"
                 name="email"
                 placeholder="Email"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
+                //value={userId}
+                value={email}
+                //onChange={(e) => setUserId(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />             
             </div>
           </div>

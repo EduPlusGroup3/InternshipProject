@@ -62,6 +62,7 @@ const AssignCoursesToStudent = () => {
   ]);
   const [isCourseAdded, setIsCourseAdded] = useState(false);
   const [error, setError] = useState("");
+  const [courseTiming, setCourseTiming] = useState([]);
 
   useEffect(() => {
     const groupsData = {
@@ -105,7 +106,8 @@ const AssignCoursesToStudent = () => {
             id: faculty.id, // replace with your actual user ID field
             //facultyName: `${faculty.firstname} ${faculty.lastname}`,
             facultyEmail: faculty.email,
-            facultyUid : faculty.uid
+            facultyUid : faculty.uid,
+            courseUids : faculty.courseUids
           }));
           setFaculties(faculties)
         }
@@ -124,15 +126,17 @@ const AssignCoursesToStudent = () => {
     setCourseType("");        
   };
 
-  const handleCourseChange = (course) => {
+  const handleCourseChange = async (course) => {
     const selectedCourseData = Categories.find(
       (category) => category.CategoryName === selectedCategory
     )?.Courses.find((c) => c.CourseName === course);
   
     setSelectedCourse(course);
   
-    const faculties = Object.keys(selectedCourseData?.FacultyTypes || {});
-    setAvailableFaculties(faculties);
+    //const faculties = Object.keys(selectedCourseData?.FacultyTypes || {});
+    const matchingFaculties = await findFacultyByCategoryAndCourse (faculties, selectedCategory, course);
+    const uniqueArray = [...new Set(matchingFaculties)];
+    setAvailableFaculties(uniqueArray);
     setSelectedFaculty("");    
     setAvailableTypes([]);     
     setCourseType("");         
@@ -153,11 +157,15 @@ const AssignCoursesToStudent = () => {
     setCourseType(type);
     setSelectedGroup("");    
     if (type === "Individual") {
+
+      const timeSlots = fetchTimeSlots(selectedFaculty, type);
+      setDummyTimeSlots(timeSlots);
+      /*
       setDummyTimeSlots([
         "2023-11-20 09:00 AM",
         "2023-11-21 03:45 PM",
         "2023-11-22 01:30 PM",
-      ]);
+      ]);*/
     }
   };
 
@@ -166,11 +174,12 @@ const AssignCoursesToStudent = () => {
       console.log("Selected Group:", group);
   
       setSelectedGroup(group);
-  
-      const groupTimeSlots = fetchTimeSlotsForGroup(group);
-      console.log("Group Time Slots:", groupTimeSlots);
-  
-      setDummyTimeSlots(groupTimeSlots);
+      
+      const timeSlots = fetchTimeSlots(selectedFaculty, "Group");
+      setDummyTimeSlots(timeSlots);
+      //const groupTimeSlots = fetchTimeSlotsForGroup(group);
+      //console.log("Group Time Slots:", groupTimeSlots); 
+      //setDummyTimeSlots(groupTimeSlots);
       console.log("Selected Time:", selectedTime);
       setSelectedTime([]);
     } else {
@@ -195,7 +204,6 @@ const AssignCoursesToStudent = () => {
       // Fetch the existing student data using studentUid
       const existingStudentSnapshot = await get(ref(database, `child/${studentUid}`));
       const existingStudentData = existingStudentSnapshot.val();
-      //console.log("existingStudentData-->", existingStudentData);
 
       const courseUids = existingStudentData.courseUids || [];
       // Update the student record with the new courseUid
@@ -203,22 +211,7 @@ const AssignCoursesToStudent = () => {
         ...existingStudentData,
         courseUids: [courseUid, ...courseUids],
       };
-      //console.log("updatedStudentData-->", updatedStudentData);
       await set(ref(database, `child/${studentUid}`), updatedStudentData);
-
-      /*
-      // Fetch the existing faculty data using studentUid
-      const existingFacultySnapshot = await get(ref(database, `users/faculty/${facultyUid}`));
-      const existingFacultyData = existingFacultySnapshot.val();
-
-      let courseUids = existingFacultyData.courseUids || [];
-      // Update the student record with the new courseUid
-      const updatedFacultyData = {
-        ...existingFacultyData,
-        courseUid: courseUid,
-      };
-      await set(ref(database, `users/faculty/${facultyUid}`), updatedFacultyData);
-      */
 
       const courseData = {
         uid: courseUid,
@@ -263,6 +256,62 @@ const AssignCoursesToStudent = () => {
   return foundFaculty ?  foundFaculty.facultyUid : null;
    };
   
+  // Function to fetch course data from Firebase using courseId
+  const getCourseDataFromFirebase = async (courseId) => {
+  const database = getDatabase();
+  const courseRef = ref(database, `courses/${courseId}`);
+
+  try {
+    const snapshot = await get(courseRef);
+    if (snapshot.exists()) {
+      return snapshot.val();
+    }
+  } catch (error) {
+    console.error("Error fetching course data:", error);
+  }
+
+  return null;
+  };
+
+
+  // Function to find faculty by Category and Course
+  const findFacultyByCategoryAndCourse = async (faculties, selectedCategory, selectedCourse) => {
+  const matchingFaculties = [];
+  const courseTimeDetail = [];
+  for (const faculty of faculties) {
+    const courseValues = Object.values(faculty.courseUids)
+    for (const courseUid of courseValues) {
+      const courseData = await getCourseDataFromFirebase(courseUid);
+      if (
+        courseData &&
+        courseData.selectedCategory === selectedCategory &&
+        courseData.selectedCourse === selectedCourse
+      ) {
+        //console.log("courseType->",courseType);
+        const courseDetail = {
+          email: faculty.facultyEmail,
+          courseType: courseData.courseType,
+          timeSlot: courseData.courseDate + " " + courseData.selectedTimings
+        };
+        courseTimeDetail.push(courseDetail);
+        matchingFaculties.push(faculty.facultyEmail);
+        //break;
+      }
+    }
+  }
+  console.log("courseTimeDetail-->",courseTimeDetail);
+  setCourseTiming(courseTimeDetail);
+  return matchingFaculties; 
+};
+
+  const fetchTimeSlots = (email, courseType) => {
+    const matchingCourses = courseTiming
+    .filter((course) => course.email === email && course.courseType === courseType)
+    .map((matchingCourse) => matchingCourse.timeSlot);
+
+  return matchingCourses;
+  };
+
   return (
     <div className="user-profile">
       <h2>Assign Courses to Student</h2>
@@ -336,9 +385,9 @@ const AssignCoursesToStudent = () => {
               required
             >
               <option value="">Select Faculty</option>
-              {faculties.map((faculty) => (
+              {availableFaculties.map((faculty) => (
                 <option key={faculty.id} value={faculty.id}>
-                  {faculty.facultyEmail}
+                  {faculty}
                 </option>
               ))}
             </select>
