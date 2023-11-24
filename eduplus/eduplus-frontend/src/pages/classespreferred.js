@@ -23,9 +23,10 @@ const ClassesPreferred = ({ onClose, username , isParent}) => {
         <p>Username: {username}</p>
 
         <VideoCarousel/>
+       
       <div className='cards'>
-      <h1>Check out these Courses!</h1>
-      <div className='cards__container'>
+      {/* <h1>Check out these Courses!</h1> */}
+      {/* <div className='cards__container'>
         <div className='cards__wrapper'>
           <ul className='cards__items'>
             <CardItem
@@ -74,7 +75,7 @@ const ClassesPreferred = ({ onClose, username , isParent}) => {
             />
           </ul>
         </div>
-      </div>
+      </div> */}
     </div>
     </div>
     </div>
