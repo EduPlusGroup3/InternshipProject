@@ -18,8 +18,10 @@ const UserProfile = () => {
   useEffect(() => {
     if (currentUser) {
       const uid = currentUser.uid;
+      const role = currentUser.role;
+      console.log("currentUser->",currentUser);
       const fetchData = async () => {
-        const data = await fetchUserProfileData(uid);
+        const data = await fetchUserProfileData(uid, role);
         if (data) {
           setUserData(data);
         }

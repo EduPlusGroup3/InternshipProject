@@ -1,4 +1,26 @@
 
+.class-box.attended-box.has-data table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.class-box.attended-box.has-data th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+.class-box.attended-box.has-data td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.class-box.attended-box.no-data p {
+  margin-top: 10px;
+}
+
   
   .class-box {
     border: 1px solid #ddd;

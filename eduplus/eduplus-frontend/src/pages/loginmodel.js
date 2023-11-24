@@ -31,20 +31,29 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
     const auth = getAuth();
   
     try {
-      console.log("first username --> ", username);
       if(selectedRole === "student")
       {
-        console.log("first selectedRole --> ", selectedRole);
         username = `${username}@eduplus.com`;
       }
-      console.log("username --> ", username);
       const userCredential = await signInWithEmailAndPassword(auth, username, password);
       const user = userCredential.user;
-  
+      let userRole
       // Check if the user role matches the role in the database
-      const userRole = await getUserRoleFromDatabase(user.uid); // Implement this function to get the role from your database
-  //  console.log(userRole);
-  //  console.log(selectedRole);
+
+      switch(selectedRole)
+      {
+        case "student" :
+          userRole = await getStudentRoleFromDatabase(user.uid);
+          break;
+        case "instructor" :
+          userRole = await getFacultyRoleFromDatabase(user.uid);
+          console.log("userRole",userRole);
+          break;
+        default:
+          userRole = await getUserRoleFromDatabase(user.uid);
+          break;      
+      }
+
       if (userRole === selectedRole) {
         onLogin({ username: user.email, role: selectedRole,uid:user.uid }); // Adjust this based on your user data structure
         setError("");
@@ -57,8 +66,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
         setError("Invalid user role");
       }
     } catch (error) {
-      console.log("Error-->", error);
-      setError("Invalid username or password");
+      setError("Invalid username or password", error);
     }
   };
   
@@ -73,12 +81,44 @@ const LoginModal = ({ isOpen, onClose, onLogin, openForgotModal }) => {
       }
       return null; // User role not found
     } catch (error) {
-      console.error("Error getting user role from database:", error);
+      setError("Error getting user role from database:", error);
       return null; // Handle the error as needed
     }
   };
   
+  const getFacultyRoleFromDatabase = async (uid) => {
+    const database = getDatabase();
+    const userRoleRef = ref(database, `users/faculty/${uid}/role`);
   
+    try {
+      const userRoleSnapshot = await get(userRoleRef);
+      if (userRoleSnapshot.exists()) {
+        console.log("found");
+        return userRoleSnapshot.val();
+      }
+      console.log("not found");
+      return null; // User role not found
+    } catch (error) {
+      setError("Error getting user role from database:", error);
+      return null; // Handle the error as needed
+    }
+  };
+
+  const getStudentRoleFromDatabase = async (uid) => {
+    const database = getDatabase();
+    const userRoleRef = ref(database, `child/${uid}/role`);
+  
+    try {
+      const userRoleSnapshot = await get(userRoleRef);
+      if (userRoleSnapshot.exists()) {
+        return userRoleSnapshot.val();
+      }
+      return null; // User role not found
+    } catch (error) {
+      setError("Error getting user role from database:", error);
+      return null; // Handle the error as needed
+    }
+  };
 
   return (
     <div className="modal-overlay">

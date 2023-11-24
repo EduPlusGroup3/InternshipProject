@@ -1,299 +1,298 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import "react-time-picker/dist/TimePicker.css";
+import "../assests/styles/registrationpagestyles.css";
+import categoryData from "../dummydata/categoryData";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { getDatabase, ref, set, get } from "firebase/database";
-import countriesList from "../dummydata/countries";
-import { useAuth } from "./authcontext";
+import { getDatabase, ref, set, get,child,update } from "firebase/database";
+import { useAuth } from "../pages/authcontext";
 import { fetchUserProfileData } from "./firebaseFunctions";
-import searchIcon from "../assests/images/search.png"; 
 
-const UpdateFaculty = () => {
-  const navigate = useNavigate();
-  const { currentUser } = useAuth();
-  const [userData, setUserData] = useState(null);
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [gender, setGender] = useState("");
-  const [country, setCountry] = useState("");
-  const [dob, setDOB] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [degree, setDegree] = useState("");
-  const [error, setError] = useState("");
-  const [countries, setCountries] = useState([]);
+const RescheduleCourse = () => {
+  const categoryList = [
+    "Genio jr bot",
+    "Duplo pieces",
+    "Wedo1",
+    "Wedo2.0",
+    "Legokit",
+    "Kodu software",
+    "Scratch Software",
+    "EV3Robots",
+    "Arduino Kits",
+    "Webdevelopment",
+    "Programming",
+    "Tetrix",
+    "Competition training",
+  ];
+
+  const { Categories } = categoryData;
+
   const [userId, setUserId] = useState("");
-  const [isUpdateFaculty, setIsUpdateFaculty] = useState(false);
-  const { username: loggedInUserEmail } = useAuth();
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedTime, setSelectedTime] = useState([]);
+  const [courseDate, setCourseDate] = useState("");
+  const [searchResults, setSearchResults] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [updateMode, setUpdateMode] = useState(false);
+  const [modifiedDate, setModifiedDate] = useState("");
+  const [modifiedTime, setModifiedTime] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
 
-  useEffect(() => {
-    setCountries(countriesList);
-  }, []);
-
-  useEffect(() => {
-    if (currentUser) {
-      const uid = currentUser.uid;
-      fetchUserProfileData(uid)
-        .then((data) => {
-          setUserData(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching user profile data:", error);
-        });
-    }
-  }, [currentUser]);
-
-  const handleRegistration = async (e) => {
-    e.preventDefault();
-    const auth = getAuth();
-    const database = getDatabase();
-
-    if (
-      !firstname ||
-      !lastname ||
-      !gender ||
-      !country ||
-      !dob ||
-      !mobile ||
-      !password ||
-      !confirmPassword ||
-      !degree
-    ) {
-      setError("All fields are required");
-    } else if (password !== confirmPassword) {
-      setError("Passwords do not match");
-    } else {
-      setError("");
-      const trimmedFirstname = firstname.trim().toLowerCase();
-      const constructedEmail = `${trimmedFirstname}@eduplus.com`;
-      registerFaculty(constructedEmail);
-    }
+  const togglePopup = () => {
+    setShowPopup(!showPopup);
   };
 
-  const registerFaculty = async (email) => {
-    const auth = getAuth();
+  const handleUpdate = () => {
+    setUpdateMode(true);
+    togglePopup();
+  };
+
+  const handleCancel = () =>{
+    setUpdateMode(false);
+    togglePopup();
+  };
+
+  const handleDelete = () => {
+    setShowConfirmation(true); // Open the delete confirmation popup
+  };
+
+  const handleConfirmDelete = async () => {
+    const db = getDatabase();
+    const coursesRef = ref(db, "/courses");
+  
     try {
-      const { user } = await createUserWithEmailAndPassword(auth, email, password);
-
-      if (user) {
-        const database = getDatabase();
-        const usersRef = ref(database, "users/faculty/" + user.uid);
-        const newFaculty = {
-          role: "instructor",
-          uid: user.uid,
-          firstname,
-          lastname,
-          gender,
-          country,
-          dob,
-          mobile,
-          password,
-          degree,
-        };
-        await set(usersRef, newFaculty);
-
-        setIsUpdateFaculty(true);
-      }
+      // Delete the specific course from the database
+      await set(child(coursesRef, searchResults.id), null);
+  
+      alert("Record deleted successfully!");
+      setShowConfirmation(false); // Close the delete popup
+      setSearchResults(null); // Clear search results after deletion
     } catch (error) {
-      console.error("Error registering faculty:", error.code, error.message);
-      setError("Registration failed. Please try again later.");
+      console.error("Error deleting the database:", error);
+      // Handle the error as needed
     }
   };
 
-  const handleSearchEmail = async () => {
-    if (userId) {
-      const trimmedFirstname = userId.trim().toLowerCase();
-      const constructedEmail = `${trimmedFirstname}@eduplus.com`;
+  const handleCancelDelete = () => {
+    setShowConfirmation(false); // Close the delete popup
+  };
 
-      const database = getDatabase();
-      const userRef = ref(database, `users/faculty/${constructedEmail}`);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    const db = getDatabase();
+    const coursesRef = ref(db, "/courses");
+    if (updateMode) {
       try {
-        const userSnapshot = await get(userRef);
-        if (userSnapshot.exists()) {
-          const userData = userSnapshot.val();
-          setUserData(userData);
-          setFirstname(userData.firstname);
-          setLastname(userData.lastname);
-          setGender(userData.gender);
-          setCountry(userData.country);
-          setDOB(userData.dob);
-          setMobile(userData.mobile);
-          setDegree(userData.degree);
+        // Construct updated data
+        const updatedData = {
+          courseDate: modifiedDate,
+          selectedTimings: modifiedTime,
+        };
+
+       // Update the specific course in the database
+      await update(child(coursesRef, searchResults.id), updatedData);
+
+        alert("Record updated successfully!");
+        setUpdateMode(false); // Exit update mode
+        setShowPopup(false); // Close the popup
+      } catch (error) {
+        console.error("Error updating the database:", error);
+        // Handle the error as needed
+      }
+    } else {
+      // Handle search operation
+      try {
+        const snapshot = await get(coursesRef);
+
+        if (snapshot.exists()) {
+          const coursesData = snapshot.val();
+          const matchingCourses = Object.entries(coursesData).filter(([courseId, course]) => {
+            return (
+              course.selectedCategory === selectedCategory &&
+              course.selectedCourse === selectedCourse &&
+              course.courseDate === courseDate &&
+              course.selectedTimings === selectedTime
+            );
+          });
+
+          if (matchingCourses.length > 0) {
+            const [courseId, course] = matchingCourses[0];
+            setSearchResults({ id: courseId, ...course });
+          } else {
+            setSearchResults(null);
+          }
         } else {
-          setError("User not found");
+          setSearchResults(null);
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        setError("Error fetching user data. Please try again later.");
+        console.error("Error searching in the database:", error);
       }
-    } else {
-      setError("Please enter an email to search");
     }
   };
+  
 
   return (
+    
     <div className="user-profile">
-      {isUpdateFaculty ? (
-        <div className="registration-success">
-          <h2>Faculty Updated!</h2>
-          <p>Faculty successfully updated. Please use your email to login</p>
-          <button onClick={() => navigate("/home")}>Proceed to Home</button>
-        </div>
-      ) : (
-        <div>
-          <h2>Update Faculty</h2>
-          <form onSubmit={handleRegistration}>
-          <div className="form-group">
-            <label htmlFor="email">Email:</label>
-            <div className="search-input">
-              <input
-                type="text"
-                id="email"
-                name="email"
-                placeholder="Email"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-              />
-              <div className="search-icon-container">
-                <img
-                  src={searchIcon}
-                  alt="Search Icon"
-                  className="search-icon"
-                  onClick={handleSearchEmail}
-                />
-              </div>
-            </div>
+      <h2>Reschedule Course</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="email">Faculty Email:</label>
+          <div className="search-input">
+            <input
+              type="text"
+              id="email"
+              name="email"
+              placeholder="Email"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+            />
           </div>
-            <div className="form-group">
-              <label htmlFor="firstname">First Name:<span className="asteriskColor">*</span></label>
-              <input
-                type="text"
-                id="firstname"
-                name="firstname"
-                placeholder="First Name"
-                value={firstname}
-                onChange={(e) => setFirstname(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="lastname">Last Name:<span className="asteriskColor">*</span></label>
-              <input
-                type="text"
-                id="lastname"
-                name="lastname"
-                placeholder="Last Name"
-                value={lastname}
-                onChange={(e) => setLastname(e.target.value)}
-                required
-              />
-            </div>                       
-            <div className="form-group">
-              <label htmlFor="gender">Gender<span className="asteriskColor">*</span></label>
-              <select
-                id="gender"
-                name="gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                required
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="category">Select Category:</label>
+          <select
+            id="category"
+            name="category"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            required
+          >
+            <option value="">Select Category</option>
+            {categoryList.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {selectedCategory && (
+          <div className="form-group">
+            <label htmlFor="course">Select Course:</label>
+            <select
+              id="course"
+              name="course"
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+              required
+            >
+              <option value="">Select Course</option>
+              {Categories.find(
+                (category) => category.CategoryName === selectedCategory
+              )?.Courses.map((course) => (
+                <option key={course.CourseName} value={course.CourseName}>
+                  {course.CourseName}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+<div className="form-group">
+          <label htmlFor="courseDate">Select Course Date:</label>
+          <input
+            type="date"
+            id="courseDate"
+            name="courseDate"
+            value={courseDate}
+            onChange={(e) => setCourseDate(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="courseTime">Select Course Time:</label>
+          <input
+            type="time"
+            id="courseTime"
+            name="courseTime"
+            value={selectedTime}
+            onChange={(e) => setSelectedTime(e.target.value)}
+            required
+          />
+        </div>
+
+        <button type="submit">Search</button>
+        
+              </form>
+
+      {searchResults ? (
+        <div className="search-results">
+          <h3>Search Results:</h3>
+          <p style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>
+            {searchResults.selectedFaculty} {searchResults.selectedCourse}{" "}
+        {searchResults.courseDate} {searchResults.selectedTimings}
+            </span>
+            <span>
+              <span
+                style={{ fontWeight: "bold", cursor: "pointer" }}
+                onClick={handleUpdate}
               >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>              
-            </div>
-            <div className="form-group">
-              <label htmlFor="country">Country<span className="asteriskColor">*</span></label>
-              <select
-                id="country"
-                name="country"
-                placeholder="Country"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                required
+                Update
+              </span>{" "}
+              |{" "}
+              <span
+                style={{ fontWeight: "bold", cursor: "pointer" }}
+                onClick={handleDelete}
               >
-                <option value="">Select Country</option>
-                {countriesList.map((countryOption) => (
-                  <option key={countryOption} value={countryOption}>
-                    {countryOption}
-                  </option>
-                ))}
-              </select>
-            </div>  
-            <div className="form-group">
-              <label htmlFor="dob">Date of Birth:<span className="asteriskColor">*</span></label>
-              <input
-                type="date"
-                id="dob"
-                name="dob"
-                value={dob}
-                onChange={(e) => setDOB(e.target.value)}
-                required
-              />
-            </div>
-                      
-            <div className="form-group">
-              <label htmlFor="password">Password<span className="asteriskColor">*</span></label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password<span className="asteriskColor">*</span></label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="mobile">Mobile:</label>
-              <input
-                type="tel"
-                id="mobile"
-                name="mobile"
-                value={mobile}
-                onChange={(e) => setMobile(e.target.value)}
-              />
-            </div> 
-            <div className="form-group">
-                <label htmlFor="degree">Highest Level of Degree:<span className="asteriskColor">*</span></label>
-                <select
-                  id="degree"
-                  name="degree"
-                  value={degree}
-                  onChange={(e) => setDegree(e.target.value)}
-                  required
-                >
-                  <option value="">Select Degree</option>
-                  <option value="High School">High School</option>
-                  <option value="Associate's Degree">Associate's Degree</option>
-                  <option value="Bachelor's Degree">Bachelor's Degree</option>
-                  <option value="Master's Degree">Master's Degree</option>
-                  <option value="Doctoral Degree">Doctoral Degree</option>
-                </select>
-              </div>               
-            
-            <button type="submit">Update Faculty</button>
-          </form>
-          {error && <p className="error">{error}</p>}
+                Delete
+              </span>
+            </span>
+          </p>
+        </div>
+      ):(<p>No result found</p>)}
+
+      {showPopup && (
+        <div className="popup confirmation-popup">
+          <div className="popup-inner">
+            <label htmlFor="modifiedDate">Modified Date:</label>
+            <input
+              type="date"
+              id="modifiedDate"
+              name="modifiedDate"
+              value={modifiedDate}
+              onChange={(e) => setModifiedDate(e.target.value)}
+              required
+            />
+
+            <label htmlFor="modifiedTime">Modified Time:</label>
+            <input
+              type="time"
+              id="modifiedTime"
+              name="modifiedTime"
+              value={modifiedTime}
+              onChange={(e) => setModifiedTime(e.target.value)}
+              required
+            />
+
+            <button onClick={handleSubmit} className="action-button">Update</button>
+            <button onClick={handleCancel} className="action-button">Cancel</button>
+          </div>
         </div>
       )}
+
+
+      {showConfirmation && (
+              <div className="popup confirmation-popup">
+                <div className="popup-inner">
+                  <p>Are you sure you want to delete the record?</p>
+                  <div className="button-group">
+              <button onClick={handleConfirmDelete} className="action-button">
+                Yes
+              </button>
+              <button onClick={handleCancelDelete} className="action-button">
+                No
+              </button>
+            </div>
+                </div>
+              </div>
+            )}
     </div>
   );
-};         
+};
 
-
-export default UpdateFaculty;
+export default RescheduleCourse;

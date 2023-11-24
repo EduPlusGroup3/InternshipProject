@@ -3,9 +3,11 @@ import LoginModal from "./loginmodel";
 import UserProfile from "./userprofile";
 import { useNavigate,Link } from "react-router-dom";
 import MyClasses from "./myclasses";
+import FacultyClasses from "./facultyclasses";
 import EnquiryModal from "./enquiry"; 
 import ClassesPreferred from "./classespreferred";
 import ForgotPasswordModal from "./forgotpassword";
+import Attendance from "./attendance";
 import "../assests/styles/userhomepagestyles.css";
 import genioLogo from "../assests/images/genioLogo1.png";
 import genioLogoFooter from "../assests/images/genioLogoFooter.png";
@@ -24,7 +26,9 @@ const UserHomePage = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isClassesPreferOpen, setIsClassesPreferOpen] = useState(false);
   const [ismyClassesOpen, setIsMyClassesOpen] = useState(false);
+  const [isAttendanceOpen, setIsAttendanceOpen] = useState(false);
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+  const [isFacultyClassesOpen, setIsFacultyClassesOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
 
   const [uid, setUid] = useState(null);
@@ -35,6 +39,8 @@ const UserHomePage = () => {
     setIsClassesPreferOpen(false);
     setIsEnquiryOpen(false);
     setIsMyClassesOpen(false);
+    setIsAttendanceOpen(false);
+    setIsFacultyClassesOpen(false);
   }, []);
 
   const openLoginModal = () => {
@@ -92,22 +98,44 @@ const UserHomePage = () => {
       setIsClassesPreferOpen(false);
       setIsEnquiryOpen(false);
       setIsMyClassesOpen(false);
+      setIsAttendanceOpen(false)
+      setIsFacultyClassesOpen(false)
     } else if (link === "classesPreferred") {
       setIsClassesPreferOpen(true);
       setIsProfileOpen(false);
       setIsEnquiryOpen(false);
       setIsMyClassesOpen(false);
+      setIsAttendanceOpen(false)
+      setIsFacultyClassesOpen(false)
     } else if (link === "myclasses") {
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
       setIsEnquiryOpen(false);
       setIsMyClassesOpen(true);
+      setIsAttendanceOpen(false)
+      setIsFacultyClassesOpen(false)
     } else if (link === "enquiry") {
-      console.log("Enquiry link clicked");
       setIsClassesPreferOpen(false);
       setIsProfileOpen(false);
       setIsEnquiryOpen(true);
       setIsMyClassesOpen(false);
+      setIsAttendanceOpen(false)
+      setIsFacultyClassesOpen(false)
+    } 
+    else if (link === "attendance") {
+      setIsClassesPreferOpen(false);
+      setIsProfileOpen(false);
+      setIsEnquiryOpen(false);
+      setIsMyClassesOpen(false);
+      setIsAttendanceOpen(true)
+      setIsFacultyClassesOpen(false)
+    }else if (link === "facultyClasses") {
+      setIsClassesPreferOpen(false);
+      setIsProfileOpen(false);
+      setIsEnquiryOpen(false);
+      setIsMyClassesOpen(false);
+      setIsAttendanceOpen(false)
+      setIsFacultyClassesOpen(true)
     } else {
       setActiveLink(link);
       setOpenModal(link);
@@ -131,19 +159,39 @@ const UserHomePage = () => {
     setIsMyClassesOpen(false);
   };
 
+  const closeAttendanceModal = () => {
+    setIsAttendanceOpen(false);
+  };
+
+  const closeFacultyClassesModal = () => {
+    setIsFacultyClassesOpen(false);
+  };
+
   const isParent = currentUser && currentUser.role === 'parent';
   const isAdmin = currentUser && currentUser.role === 'admin';
-
-
+  const isInstructor = currentUser && currentUser.role === 'instructor';
+  const isStudent = currentUser && currentUser.role === 'student';
 
   const menuItems = [
-    { id: "profile", label: "Profile" },
-    { id: "classesPreferred", label: isParent ? "Available Courses" : "Classes Preferred" },
-    { id: "myclasses", label: isParent ? "Student Classes" : "My Classes"  },
-    { id: "enquiry", label: "Enquiry" },
-  ];
-
-  
+  { id: "profile", label: "Profile" },
+  { 
+    id: "classesPreferred", 
+    label: isParent ? "Available Courses" : "Classes Preferred",
+    hidden: isInstructor,
+  },
+  { id: "facultyClasses", label: "Faculty Classes",
+    hidden:isAdmin||isParent||isStudent
+  },
+  { id: "myclasses", label: isParent ? "Student Classes" : "My Classes",
+    hidden: isInstructor
+  },
+  {
+    id: "attendance", label:"Attendance",
+    hidden: isParent || isStudent,
+  },
+  { id: "enquiry", label: "Enquiry" },
+ 
+];
 
   const handleLogin = (userData) => {
     login(userData);
@@ -213,7 +261,7 @@ const UserHomePage = () => {
       <main className="userhpmain">
         <section className="menu-section">
           <VerticalMenu
-            items={menuItems}
+            items={menuItems.filter(item => !item.hidden)}
             activeItem={openModal}
             onItemClick={(item) => handleNavLinkClick(item)}
           />
@@ -223,7 +271,7 @@ const UserHomePage = () => {
             username={username}
             profileData={profileData}
           />}
-          {isClassesPreferOpen && (
+          {isClassesPreferOpen && !isInstructor && (
             <ClassesPreferred onClose={closeClassesPreferModal} username={username} isParent={isParent}/>
           )}
           {isEnquiryOpen && (
@@ -231,6 +279,12 @@ const UserHomePage = () => {
           )}
           {ismyClassesOpen && (
             <MyClasses onClose={closeMyClassesModal} username={username} classesData={dummyClassesData} isParent={isParent} />
+          )}         
+          {isAttendanceOpen && (
+            <Attendance onClose={closeAttendanceModal} username={username} classesData={dummyClassesData} />
+          )}
+          {isFacultyClassesOpen && (
+            <FacultyClasses onClose={closeFacultyClassesModal} username={username} classesData={dummyClassesData} />
           )}
         </section>
       </main>

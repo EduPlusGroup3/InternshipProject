@@ -13,6 +13,7 @@ const AddFaculty = () => {
   const [userData, setUserData] = useState(null);
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
+  const [email,setEmail] = useState("");
   const [gender, setGender] = useState("");
   const [country, setCountry] = useState("");
   const [dob, setDOB] = useState("");
@@ -49,6 +50,7 @@ const AddFaculty = () => {
     const database = getDatabase();
 
     if (
+      !email ||
       !firstname ||
       !lastname ||
       !gender ||
@@ -64,9 +66,9 @@ const AddFaculty = () => {
       setError("Passwords do not match");
     } else {
       setError("");
-      const trimmedFirstname = firstname.trim().toLowerCase();
-      const constructedEmail = `${trimmedFirstname}@eduplus.com`;
-      registerFaculty(constructedEmail);
+      //const trimmedFirstname = firstname.trim().toLowerCase();
+      //const constructedEmail = `${trimmedFirstname}@eduplus.com`;
+      registerFaculty(email);
     }
   };
 
@@ -81,6 +83,7 @@ const AddFaculty = () => {
         const newFaculty = {
           role: "instructor",
           uid: user.uid,
+          email,
           firstname,
           lastname,
           gender,
@@ -114,15 +117,18 @@ const AddFaculty = () => {
           <h2>Instructor Registration</h2>
           <form onSubmit={handleRegistration}>
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">Email:<span className="asteriskColor">*</span></label>
             <div>
               <input
                 type="text"
                 id="email"
                 name="email"
                 placeholder="Email"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
+                //value={userId}
+                value={email}
+                //onChange={(e) => setUserId(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />             
             </div>
           </div>

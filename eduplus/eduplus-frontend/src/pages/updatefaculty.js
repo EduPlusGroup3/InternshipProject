@@ -13,12 +13,11 @@ const UpdateFaculty = () => {
   const [userData, setUserData] = useState(null);
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
+  const [email,setEmail] = useState("");
   const [gender, setGender] = useState("");
   const [country, setCountry] = useState("");
   const [dob, setDOB] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [mobile, setMobile] = useState("");  
   const [degree, setDegree] = useState("");
   const [error, setError] = useState("");
   const [countries, setCountries] = useState([]);
@@ -49,20 +48,18 @@ const UpdateFaculty = () => {
     const database = getDatabase();
 
     if (
+      !userId ||
       !firstname ||
       !lastname ||
       !gender ||
       !country ||
       !dob ||
       !mobile ||
-      !password ||
-      !confirmPassword ||
+      
       !degree
     ) {
       setError("All fields are required");
-    } else if (password !== confirmPassword) {
-      setError("Passwords do not match");
-    } else {
+    }  else {
       setError("");
       const trimmedFirstname = firstname.trim().toLowerCase();
       const constructedEmail = `${trimmedFirstname}@eduplus.com`;
@@ -70,59 +67,76 @@ const UpdateFaculty = () => {
     }
   };
 
-  const registerFaculty = async (email) => {
+  const registerFaculty = async () => {
     const auth = getAuth();
     try {
-      const { user } = await createUserWithEmailAndPassword(auth, email, password);
-
-      if (user) {
-        const database = getDatabase();
-        const usersRef = ref(database, "users/faculty/" + user.uid);
-        const newFaculty = {
-          role: "instructor",
-          uid: user.uid,
-          firstname,
-          lastname,
-          gender,
-          country,
-          dob,
-          mobile,
-          password,
-          degree,
-        };
-        await set(usersRef, newFaculty);
-
-        setIsUpdateFaculty(true);
+      const user = currentUser; // Assuming currentUser is available in your component state
+      if (!user) {
+        throw new Error("User not authenticated");
       }
+  
+      const database = getDatabase();
+      const usersRef = ref(database, `users/faculty/${userData.uid}`);
+ // Fetch the current user data from the database
+ const snapshot = await get(usersRef);
+ const currentData = snapshot.val();
+
+      console.log("ref", usersRef);
+    // Log the UID you are updating
+    console.log("Updating user with UID:", userData.uid);
+     // Update only the fields that have changed
+     const updatedData = {
+      ...currentData,
+      firstname: firstname || currentData.firstname,
+      lastname: lastname || currentData.lastname,
+      gender: gender || currentData.gender,
+      country: country || currentData.country,
+      dob: dob || currentData.dob,
+      mobile: mobile || currentData.mobile,
+      degree: degree || currentData.degree,
+    };
+
+  // Update the specific user's data
+  await set(usersRef, updatedData);
+      setIsUpdateFaculty(true);
     } catch (error) {
-      console.error("Error registering faculty:", error.code, error.message);
-      setError("Registration failed. Please try again later.");
+      console.error("Error updating faculty:", error);
+      setError("Update failed. Please try again later.");
     }
   };
-
   const handleSearchEmail = async () => {
     if (userId) {
       const trimmedFirstname = userId.trim().toLowerCase();
-      const constructedEmail = `${trimmedFirstname}@eduplus.com`;
-
       const database = getDatabase();
-      const userRef = ref(database, `users/faculty/${constructedEmail}`);
+      const usersRef = ref(database, "users/faculty");
 
       try {
-        const userSnapshot = await get(userRef);
-        if (userSnapshot.exists()) {
+        const userSnapshot = await get(usersRef);
+        let foundUser = null; // Variable to store the found user
+        userSnapshot.forEach((userSnapshot) => {
           const userData = userSnapshot.val();
-          setUserData(userData);
-          setFirstname(userData.firstname);
-          setLastname(userData.lastname);
-          setGender(userData.gender);
-          setCountry(userData.country);
-          setDOB(userData.dob);
-          setMobile(userData.mobile);
-          setDegree(userData.degree);
-        } else {
-          setError("User not found");
-        }
+          if (userData.email === `${trimmedFirstname}@eduplus.com`) {
+            setEmail(userData.email);
+            setUserData(userData);
+            setFirstname(userData.firstname);
+            setLastname(userData.lastname);
+            setGender(userData.gender);
+            setCountry(userData.country);
+            setDOB(userData.dob);
+            setMobile(userData.mobile);
+            setDegree(userData.degree);
+            
+
+             // Save the UID of the found user
+          foundUser = userSnapshot.key;
+          }
+        });
+        // If user is not found after iterating through all nodes
+      if (!foundUser) {
+        setError("User not found");
+      } 
+        
+        
       } catch (error) {
         console.error("Error fetching user data:", error);
         setError("Error fetching user data. Please try again later.");
@@ -137,7 +151,7 @@ const UpdateFaculty = () => {
       {isUpdateFaculty ? (
         <div className="registration-success">
           <h2>Faculty Updated!</h2>
-          <p>Faculty successfully updated. Please use your email to login</p>
+          <p>Faculty successfully updated.</p>
           <button onClick={() => navigate("/home")}>Proceed to Home</button>
         </div>
       ) : (
@@ -145,7 +159,7 @@ const UpdateFaculty = () => {
           <h2>Update Faculty</h2>
           <form onSubmit={handleRegistration}>
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">Email:<span className="asteriskColor">*</span></label>
             <div className="search-input">
               <input
                 type="text"
@@ -232,32 +246,8 @@ const UpdateFaculty = () => {
                 onChange={(e) => setDOB(e.target.value)}
                 required
               />
-            </div>
-                      
-            <div className="form-group">
-              <label htmlFor="password">Password<span className="asteriskColor">*</span></label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password<span className="asteriskColor">*</span></label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
+            </div>                      
+         
             <div className="form-group">
               <label htmlFor="mobile">Mobile:</label>
               <input
