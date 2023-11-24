@@ -226,7 +226,7 @@ const AddFaculty = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="mobile">Mobile:</label>
+              <label htmlFor="mobile">Mobile:<span className="asteriskColor">*</span></label>
               <input
                 type="tel"
                 id="mobile"

@@ -102,10 +102,7 @@ const EnquiryModal = ({ onClose, uid }) => {
       alert("Enquiry successfully sent to the admin");
 
       // Reset the form fields
-      setEmail("");
       setContactNo("");
-      setCountry("");
-      setRegion("");
       setSubject("");
       setMessage("");
     }

@@ -444,8 +444,10 @@ const AssignCoursesToStudent = () => {
                   id={`timeSlot${index}`}
                   name="timeSlot"
                   value={time}
+                  required
                   checked={selectedTime === time}
-                  onChange={() => handleTimeChange(time)}
+                  onChange={() => handleTimeChange(time)
+                  }
                 />
                 <label htmlFor={`timeSlot${index}`}>{time}</label>
                 </div>
@@ -463,6 +465,7 @@ const AssignCoursesToStudent = () => {
                   id={`timeSlot${index}`}
                   name="timeSlot"
                   value={time}
+                  required
                   checked={selectedTime === time}
                   onChange={() => handleTimeChange(time)}
                 />

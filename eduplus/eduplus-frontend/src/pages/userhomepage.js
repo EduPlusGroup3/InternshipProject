@@ -189,7 +189,9 @@ const UserHomePage = () => {
     id: "attendance", label:"Attendance",
     hidden: isParent || isStudent,
   },
-  { id: "enquiry", label: "Enquiry" },
+  { id: "enquiry", label: "Enquiry" ,
+    hidden: isStudent
+},
  
 ];
 

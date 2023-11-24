@@ -236,6 +236,7 @@ const AssignCourses = () => {
               rows="3"
               cols="50"
               readOnly
+              required
             />
           </div>
         )}
