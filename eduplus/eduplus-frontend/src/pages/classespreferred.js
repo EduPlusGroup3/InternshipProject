@@ -1,83 +1,44 @@
-import React from "react";
-import CardItem from "./carditem";
-import "../assests/styles/cards.css";
-import image2 from "../assests/images/image2.jpg";
-import image3 from "../assests/images/image3.jpg";
-import image4 from "../assests/images/image4.jpg";
-import "../assests/styles/VideoCarousel.css";
-import VideoCarousel from "../components/VideoCarousel";
+import React from 'react';
+import VideoCard from './videocard';
+import Vid1 from "../assests/videos/vid1.mp4";
+import Vid2 from "../assests/videos/vid2.mp4";
+import Vid3 from "../assests/videos/vid3.mp4";
+import "../assests/styles/classespreferredstyles.css";
 
+const ClassesPreferred = ({ onClose, username }) => {
+  const videos = [
+    {
+      title: 'For age 6-8',
+      description: 'Video for Kids aged 6-8',
+      videoPath: Vid1,
+      ageGroup: 'Kids',
+    },
+    {
+      title: 'For age 9-14',
+      description: 'Video for Kids aged 9-14',
+      videoPath: Vid2,
+      ageGroup: 'Teens',
+    },
+    {
+      title: 'For age 14-17',
+      description: 'Video for Kids aged 14-17',
+      videoPath: Vid3,
+      ageGroup: 'Teens',
+    }  
+  ];
 
-
-const ClassesPreferred = ({ onClose, username , isParent}) => {
   return (
     <div className="user-profile">
-      <div className="profile-content">       
-        {isParent ? (
-          // Render content for admin
-          <h2>Available Courses</h2>
-        ) : (
-          // Render content for non-admin
-          <h2>Classes Preferred</h2>
-        )}
-        <p>Username: {username}</p>
-
-        <VideoCarousel/>
-       
-      <div className='cards'>
-      {/* <h1>Check out these Courses!</h1> */}
-      {/* <div className='cards__container'>
-        <div className='cards__wrapper'>
-          <ul className='cards__items'>
-            <CardItem
-              src={image2}
-              text='Robotics'
-              label='10 yrs'
-              path='/services'
-            />
-            <CardItem
-              src={image2}
-              text='Internet of Things'
-              label='10 yrs'
-              path='/services'
-            />
-          </ul>
-          <ul className='cards__items'>
-            <CardItem
-              src={image2}
-              text='Machine Learning'
-              label='14 yrs'
-              path='/services'
-            />
-            <CardItem
-              src={image2}
-              text='Java coding for kids!'
-              label='13 yrs'
-              path='/products'
-            />
-            <CardItem
-              src={image2}
-              text='Python for kids'
-              label='13 yrs'
-              path='/sign-up'
-            />
-            <CardItem
-              src={image2}
-              text='Python for kids'
-              label='13 yrs'
-              path='/sign-up'
-            />
-            <CardItem
-              src={image2}
-              text='Python for kids'
-              label='13 yrs'
-              path='/sign-up'
-            />
-          </ul>
+      <div className="profile-content">
+        <h2>Classes Preferred</h2>
+        <div className="videos-container">
+          <div className="video-row">
+            {videos.map((video, index) => (
+              <VideoCard key={index} {...video} />
+            ))}
+          </div>
         </div>
-      </div> */}
-    </div>
-    </div>
+      </div>
     </div>
   );
 };

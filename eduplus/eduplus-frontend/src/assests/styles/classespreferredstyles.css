@@ -1,0 +1,28 @@
+.videos-container {
+  margin: 20px;
+}
+
+.video-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.video-card {
+  width: 50%; /* or adjust based on your preference */
+  flex-shrink: 0;
+  transition: transform 0.3s ease-in-out; /* Add transition for smooth effect */
+}
+
+.video-card:hover {
+  transform: scale(1.1); /* Increase the size on hover */
+}
+
+.video-card video {
+  width: 100%;
+  transition: width 0.3s ease-in-out; /* Add transition for smooth effect */
+}
+
+.video-card:hover video {
+  width: 110%; /* Increase the video width on hover */
+}
